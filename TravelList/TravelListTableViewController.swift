@@ -16,10 +16,25 @@ class TravelListTableViewController: UITableViewController {
     }
     
     var travelItems: NSMutableArray = []
-
+    var logoView: UIImageView!
     
     override func viewDidLoad(){
         super.viewDidLoad()
+        self.tableView.tableFooterView = UIView(frame: CGRectZero)
+        self.tableView.contentInset = UIEdgeInsets(top: 0, left: -10, bottom: 0, right: 0)
+        
+        logoView = UIImageView(frame: CGRectMake(0, 0, 40, 40))
+        logoView.image = UIImage(named: "logoTravel")?.imageWithRenderingMode(.AlwaysTemplate)
+        logoView.frame.origin.x = (self.view.frame.size.width - logoView.frame.size.width) / 2
+        logoView.frame.origin.y = 20
+        logoView.tintColor = toColor("#F9F9F9")
+        
+        // Add the logo view to the navigation controller.
+        self.navigationController?.view.addSubview(logoView)
+        
+        // Bring the logo view to the front.
+        self.navigationController?.view.bringSubviewToFront(logoView)
+        
         loadInitialData()
     }
     
@@ -40,14 +55,19 @@ class TravelListTableViewController: UITableViewController {
         return self.travelItems.count
     }
     
+
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let CellIndentifier: NSString = "ListPrototypeCell"
         
         var cell : UITableViewCell = tableView.dequeueReusableCellWithIdentifier(CellIndentifier as String) as! UITableViewCell
         
+        
+        
         var travelItem = self.travelItems.objectAtIndex(indexPath.row) as! TravelListItem
         
         cell.textLabel?.text = travelItem.itemName as String
+        cell.textLabel?.textColor = UIColor.whiteColor()
+
         
         if travelItem.completed{
             cell.accessoryType = .Checkmark

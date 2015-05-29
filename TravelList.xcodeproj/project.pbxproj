@@ -13,6 +13,7 @@
 		79C5974919418A280085192D /* AddTravelViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79C5974819418A280085192D /* AddTravelViewController.swift */; };
 		79C5974C19418A280085192D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 79C5974A19418A280085192D /* Main.storyboard */; };
 		79C5974E19418A280085192D /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 79C5974D19418A280085192D /* Images.xcassets */; };
+		7F0D5A751B17E6940021A4DB /* Hex.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F0D5A741B17E6940021A4DB /* Hex.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -26,6 +27,7 @@
 		79C5974D19418A280085192D /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		79C5975819418A280085192D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		79C5975919418A280085192D /* TravelListTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TravelListTests.swift; sourceTree = "<group>"; };
+		7F0D5A741B17E6940021A4DB /* Hex.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Hex.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -62,6 +64,7 @@
 				7928D5A51941ACBF00654B60 /* TravelListTableViewController.swift */,
 				795A073C1941B68E00BFB490 /* TravelListItem.swift */,
 				79C5974619418A280085192D /* AppDelegate.swift */,
+				7F0D5A741B17E6940021A4DB /* Hex.swift */,
 				79C5974819418A280085192D /* AddTravelViewController.swift */,
 				79C5974A19418A280085192D /* Main.storyboard */,
 				79C5974D19418A280085192D /* Images.xcassets */,
@@ -165,6 +168,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				79C5974919418A280085192D /* AddTravelViewController.swift in Sources */,
+				7F0D5A751B17E6940021A4DB /* Hex.swift in Sources */,
 				7928D5A61941ACBF00654B60 /* TravelListTableViewController.swift in Sources */,
 				795A073D1941B68E00BFB490 /* TravelListItem.swift in Sources */,
 				79C5974719418A280085192D /* AppDelegate.swift in Sources */,

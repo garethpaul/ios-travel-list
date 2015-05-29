@@ -4,20 +4,30 @@
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="7520"/>
     </dependencies>
     <scenes>
-        <!--Travel List-->
+        <!--Travel List Table View Controller-->
         <scene sceneID="iMM-s8-zSe">
             <objects>
                 <tableViewController id="3En-Oc-1qi" customClass="TravelListTableViewController" customModule="TravelList" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" id="l2c-EK-le9">
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <color key="backgroundColor" red="0.1058823529" green="0.1137254902" blue="0.10980392160000001" alpha="1" colorSpace="calibratedRGB"/>
+                        <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <color key="separatorColor" red="0.68627450980392157" green="0.69411764705882351" blue="0.70588235294117652" alpha="1" colorSpace="calibratedRGB"/>
+                        <color key="sectionIndexColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <color key="sectionIndexBackgroundColor" red="0.10588235294117647" green="0.11372549019607843" blue="0.10980392156862745" alpha="1" colorSpace="calibratedRGB"/>
+                        <color key="sectionIndexTrackingBackgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                         <prototypes>
                             <tableViewCell contentMode="scaleToFill" selectionStyle="none" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="ListPrototypeCell" id="7PZ-xq-VdX">
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="7PZ-xq-VdX" id="Ega-SJ-WL3">
                                     <autoresizingMask key="autoresizingMask"/>
+                                    <color key="backgroundColor" red="0.1058823529" green="0.1137254902" blue="0.10980392160000001" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 </tableViewCellContentView>
+                                <color key="backgroundColor" red="0.1058823529" green="0.1137254902" blue="0.10980392160000001" alpha="1" colorSpace="calibratedRGB"/>
+                                <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <inset key="separatorInset" minX="15" minY="0.0" maxX="0.0" maxY="0.0"/>
                             </tableViewCell>
                         </prototypes>
                         <sections/>
@@ -26,7 +36,7 @@
                             <outlet property="delegate" destination="3En-Oc-1qi" id="7j1-e6-Q01"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" title="Travel List" id="JXx-5k-B46">
+                    <navigationItem key="navigationItem" id="JXx-5k-B46">
                         <barButtonItem key="rightBarButtonItem" systemItem="add" id="iAL-Nj-KKB">
                             <connections>
                                 <segue destination="vLz-Qu-Afi" kind="show" id="ceE-J8-Ehm"/>
@@ -39,7 +49,7 @@
             </objects>
             <point key="canvasLocation" x="921" y="295"/>
         </scene>
-        <!--Add Travel Item-->
+        <!--Add Travel View Controller-->
         <scene sceneID="zot-Wg-S8E">
             <objects>
                 <viewController id="vLz-Qu-Afi" customClass="AddTravelViewController" customModule="TravelList" customModuleProvider="target" sceneMemberID="viewController">
@@ -57,7 +67,7 @@
                                 <textInputTraits key="textInputTraits"/>
                             </textField>
                         </subviews>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <color key="backgroundColor" red="0.68627450980000004" green="0.69411764710000001" blue="0.70588235290000001" alpha="1" colorSpace="calibratedRGB"/>
                         <constraints>
                             <constraint firstItem="BVC-Ud-MB2" firstAttribute="top" secondItem="Hv2-d0-dko" secondAttribute="bottom" constant="88" id="Pv5-Fu-hfQ"/>
                             <constraint firstItem="BVC-Ud-MB2" firstAttribute="top" secondItem="Hv2-d0-dko" secondAttribute="bottom" constant="88" id="Qs9-50-bRd"/>
@@ -87,7 +97,7 @@
                             </mask>
                         </variation>
                     </view>
-                    <navigationItem key="navigationItem" title="Add Travel Item" id="s6B-4w-QTk">
+                    <navigationItem key="navigationItem" id="s6B-4w-QTk">
                         <barButtonItem key="leftBarButtonItem" systemItem="cancel" id="r0J-OF-Sn3">
                             <connections>
                                 <segue destination="2iH-ld-loW" kind="unwind" unwindAction="unwindToList:" id="uSu-xB-diV"/>
@@ -117,6 +127,11 @@
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="RAA-Mf-V6Q">
                         <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
+                        <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <color key="barTintColor" red="0.15294117647058825" green="0.71764705882352942" blue="0.49019607843137253" alpha="1" colorSpace="calibratedRGB"/>
+                        <textAttributes key="titleTextAttributes">
+                            <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        </textAttributes>
                     </navigationBar>
                     <nil name="viewControllers"/>
                     <connections>
