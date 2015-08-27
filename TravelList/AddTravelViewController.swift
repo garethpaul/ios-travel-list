@@ -37,8 +37,8 @@ class AddTravelViewController: UIViewController {
         if sender as? NSObject != self.doneButton{
             return
         }
-        if !self.textfield.text.isEmpty{
-            self.travelItem = TravelListItem(name: self.textfield.text)
+        if !self.textfield.text!.isEmpty{
+            self.travelItem = TravelListItem(name: self.textfield.text!)
         }
     }
     
