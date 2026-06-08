@@ -19,6 +19,7 @@ Priority:
 - Preserve add-item and list-display behavior
 - Keep screenshot and README aligned with app behavior
 - Avoid syncing or uploading travel-list data without explicit design
+- Keep table rendering guarded against stale local indexes
 - Maintain a small Xcode project structure
 - Keep `scripts/check-baseline.py` passing for local-first list behavior,
   item trimming, storyboard wiring, Xcode metadata, and source inventory
@@ -47,8 +48,8 @@ and avoid logging, syncing, or uploading item data without clear user action.
 
 Current baseline: `make check` runs `scripts/check-baseline.py` without Xcode.
 It verifies plist/storyboard/asset metadata, local-first list flow, whitespace
-trimming, guarded storyboard/table flows, side-effect-free cell rendering,
-invalid color fallback, and no logging, network, upload, analytics, or
+trimming, guarded storyboard/table flows, cell index checks, side-effect-free
+cell rendering, invalid color fallback, and no logging, network, upload, analytics, or
 persistence behavior.
 
 ## What We Will Not Merge (For Now)

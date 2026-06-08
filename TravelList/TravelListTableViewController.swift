@@ -64,6 +64,10 @@ class TravelListTableViewController: UITableViewController {
         guard let cell = tableView.dequeueReusableCellWithIdentifier(CellIndentifier as String) else {
             return UITableViewCell()
         }
+
+        if indexPath.row >= self.travelItems.count {
+            return cell
+        }
         
         guard let travelItem = self.travelItems.objectAtIndex(indexPath.row) as? TravelListItem else {
             return cell
@@ -96,7 +100,6 @@ class TravelListTableViewController: UITableViewController {
         
     }
 }
-
 
 
 
