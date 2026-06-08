@@ -74,4 +74,4 @@ Keep changes small and tied to the project that is already present in this repos
 
 Prior README summary:
 
-> iOS Travel List <!-- README-OVERVIEW-IMAGE --> <p> A simple travel companion app 💳</p>
+> iOS Travel List <p> A simple travel companion app 💳</p>
