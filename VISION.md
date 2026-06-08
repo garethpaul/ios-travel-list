@@ -1,5 +1,8 @@
 ## iOS Travel List Vision
 
+This document explains the current state and direction of the project.
+Project overview and developer docs: [`README.md`](README.md)
+
 iOS Travel List is a simple Swift travel companion app for tracking items so
 they are not forgotten while traveling.
 
