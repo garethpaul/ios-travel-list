@@ -30,6 +30,7 @@ Helpful reports include:
 - No primary dependency manifest was detected in the repository root. If dependencies are added later, include a manifest and prefer reproducible installation instructions.
 - Travel lists can reveal personal plans and routines. Keep item data local-first unless a future change documents storage, sync, consent, retention, and deletion behavior.
 - `make check` runs a static baseline that guards plist/storyboard metadata, Xcode project wiring, source inventory, item trimming, cell rendering, and logging/network/persistence regressions when Xcode is unavailable.
+- Keep text-field reads, storyboard casts, table indexes, and color parsing guarded so malformed local UI state does not crash the sample.
 
 ## Mobile Privacy Notes
 

@@ -47,8 +47,9 @@ and avoid logging, syncing, or uploading item data without clear user action.
 
 Current baseline: `make check` runs `scripts/check-baseline.py` without Xcode.
 It verifies plist/storyboard/asset metadata, local-first list flow, whitespace
-trimming, side-effect-free cell rendering, and no logging, network, upload,
-analytics, or persistence behavior.
+trimming, guarded storyboard/table flows, side-effect-free cell rendering,
+invalid color fallback, and no logging, network, upload, analytics, or
+persistence behavior.
 
 ## What We Will Not Merge (For Now)
 

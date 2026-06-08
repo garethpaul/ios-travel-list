@@ -9,6 +9,8 @@ status: completed
 ## Objectives
 
 - Trim new item names and reject whitespace-only entries.
+- Avoid force-unwrapping text fields, storyboard cells, and invalid table indexes.
+- Reject partial invalid hex color scans.
 - Keep cell rendering side-effect free by avoiding table reloads from `cellForRowAtIndexPath`.
 - Add a local `make check` baseline for Xcode metadata, plist/storyboard/asset JSON, source inventory, list-flow guardrails, and local-first privacy checks.
 - Document legacy Xcode verification expectations and non-macOS static checks.

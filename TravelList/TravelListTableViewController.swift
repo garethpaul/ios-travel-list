@@ -7,7 +7,9 @@ import UIKit
 class TravelListTableViewController: UITableViewController {
 
     @IBAction func unwindToList(segue:UIStoryboardSegue){
-        let source: AddTravelViewController = segue.sourceViewController as! AddTravelViewController
+        guard let source = segue.sourceViewController as? AddTravelViewController else {
+            return
+        }
         if let item: TravelListItem = source.travelItem{
             self.travelItems.addObject(item)
             self.tableView.reloadData()
@@ -59,9 +61,13 @@ class TravelListTableViewController: UITableViewController {
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let CellIndentifier: NSString = "ListPrototypeCell"
         
-        let cell : UITableViewCell = tableView.dequeueReusableCellWithIdentifier(CellIndentifier as String)!
+        guard let cell = tableView.dequeueReusableCellWithIdentifier(CellIndentifier as String) else {
+            return UITableViewCell()
+        }
         
-        let travelItem = self.travelItems.objectAtIndex(indexPath.row) as! TravelListItem
+        guard let travelItem = self.travelItems.objectAtIndex(indexPath.row) as? TravelListItem else {
+            return cell
+        }
         
         cell.textLabel?.text = travelItem.itemName as String
         cell.textLabel?.textColor = UIColor.whiteColor()
@@ -82,12 +88,14 @@ class TravelListTableViewController: UITableViewController {
     
     override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         tableView.deselectRowAtIndexPath(indexPath, animated: false)
+        if indexPath.row >= self.travelItems.count {
+            return
+        }
         self.travelItems.removeObjectAtIndex(indexPath.row)
         tableView.reloadData()
         
     }
 }
-
 
 
 

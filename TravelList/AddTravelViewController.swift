@@ -34,11 +34,11 @@ class AddTravelViewController: UIViewController {
     }
     
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+        self.travelItem = nil
         if sender as? NSObject != self.doneButton{
             return
         }
-        let itemName = self.textfield.text!.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet())
-        if !itemName.isEmpty{
+        if let itemName = self.textfield.text?.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet()) where !itemName.isEmpty{
             self.travelItem = TravelListItem(name: itemName)
         }
     }

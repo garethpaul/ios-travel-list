@@ -144,8 +144,21 @@ def main():
     require("stringByTrimmingCharactersInSet" in add_controller and "whitespaceAndNewlineCharacterSet" in add_controller,
             "AddTravelViewController must trim item names before accepting them",
             failures)
-    require("if !itemName.isEmpty" in add_controller and "TravelListItem(name: itemName)" in add_controller,
+    require("travelItem = nil" in add_controller and "text?.stringByTrimmingCharactersInSet" in add_controller,
+            "AddTravelViewController must avoid force-unwrapping text and clear stale pending items",
+            failures)
+    require("!itemName.isEmpty" in add_controller and "TravelListItem(name: itemName)" in add_controller,
             "AddTravelViewController must reject whitespace-only items",
+            failures)
+    hex_source = read("TravelList/Hex.swift")
+    require("let scanner = NSScanner(string: cString)" in hex_source and "scanner.atEnd" in hex_source,
+            "Hex parser must reject partial invalid scans",
+            failures)
+    require("as? AddTravelViewController" in table_controller and "as? TravelListItem" in table_controller,
+            "TravelListTableViewController must guard storyboard and item casts",
+            failures)
+    require("return UITableViewCell()" in table_controller and "indexPath.row >= self.travelItems.count" in table_controller,
+            "TravelListTableViewController must guard unexpected cell wiring and invalid delete indexes",
             failures)
     cell_method = table_controller.split("cellForRowAtIndexPath", 1)[1].split("didSelectRowAtIndexPath", 1)[0]
     require("reloadData" not in cell_method,
@@ -159,6 +172,9 @@ def main():
             failures)
     require(not re.search(r"\b(?:print|println|NSLog)\s*\(", swift_sources),
             "Travel-list data must not be debug logged",
+            failures)
+    require("as!" not in swift_sources and "text!" not in swift_sources,
+            "Travel-list sources must avoid force-casts and force-unwrapped text fields",
             failures)
     for forbidden in ["NSURL", "URLSession", "NSURLConnection", "http://", "https://", "upload", "analytics", "NSUserDefaults", "UserDefaults"]:
         require(forbidden not in swift_sources,
@@ -175,8 +191,8 @@ def main():
     require("make check" in readme and "TravelList.xcodeproj" in readme and "local-first" in readme.lower(),
             "README must document static verification, project usage, and local-first behavior",
             failures)
-    require("whitespace" in readme.lower() and "cell rendering" in readme.lower(),
-            "README must document item trimming and cell rendering guardrails",
+    require("whitespace" in readme.lower() and "cell rendering" in readme.lower() and "color fallback" in readme.lower(),
+            "README must document item trimming, cell rendering, and parser guardrails",
             failures)
     require("scripts/check-baseline.py" in vision and "local-first" in vision.lower(),
             "VISION must describe the current static travel-list baseline",
@@ -184,8 +200,8 @@ def main():
     require("travel lists" in security.lower() and "make check" in security,
             "SECURITY must document travel-list privacy and the static baseline",
             failures)
-    require("whitespace-only" in changes and "cell rendering" in changes and "make check" in changes,
-            "CHANGES must record item trimming, cell rendering cleanup, and baseline",
+    require("whitespace-only" in changes and "hex color" in changes and "cell rendering" in changes and "make check" in changes,
+            "CHANGES must record item trimming, parser hardening, cell rendering cleanup, and baseline",
             failures)
     require("status: completed" in plan,
             "plan must be marked completed",
