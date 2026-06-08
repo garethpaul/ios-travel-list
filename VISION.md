@@ -20,10 +20,11 @@ Priority:
 - Keep screenshot and README aligned with app behavior
 - Avoid syncing or uploading travel-list data without explicit design
 - Maintain a small Xcode project structure
+- Keep `scripts/check-baseline.py` passing for local-first list behavior,
+  item trimming, storyboard wiring, Xcode metadata, and source inventory
 
 Next priorities:
 
-- Add README setup and verification instructions
 - Strengthen tests around adding, displaying, and clearing travel items
 - Modernize Swift/project settings in a dedicated pass
 - Clarify persistence behavior and data ownership
@@ -43,6 +44,11 @@ Canonical security policy and reporting:
 
 Travel lists can reveal personal plans. The app should remain local by default
 and avoid logging, syncing, or uploading item data without clear user action.
+
+Current baseline: `make check` runs `scripts/check-baseline.py` without Xcode.
+It verifies plist/storyboard/asset metadata, local-first list flow, whitespace
+trimming, side-effect-free cell rendering, and no logging, network, upload,
+analytics, or persistence behavior.
 
 ## What We Will Not Merge (For Now)
 

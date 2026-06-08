@@ -37,8 +37,9 @@ class AddTravelViewController: UIViewController {
         if sender as? NSObject != self.doneButton{
             return
         }
-        if !self.textfield.text!.isEmpty{
-            self.travelItem = TravelListItem(name: self.textfield.text!)
+        let itemName = self.textfield.text!.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet())
+        if !itemName.isEmpty{
+            self.travelItem = TravelListItem(name: itemName)
         }
     }
     
@@ -48,4 +49,3 @@ class AddTravelViewController: UIViewController {
 
 
 }
-

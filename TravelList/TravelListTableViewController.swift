@@ -69,9 +69,6 @@ class TravelListTableViewController: UITableViewController {
         
         if travelItem.completed{
             cell.accessoryType = .Checkmark
-
-            tableView.reloadData()
-
         }
             
         else{
@@ -90,7 +87,6 @@ class TravelListTableViewController: UITableViewController {
         
     }
 }
-
 
 
 

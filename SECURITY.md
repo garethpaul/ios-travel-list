@@ -28,6 +28,8 @@ Helpful reports include:
 - Review found network clients, sockets, web APIs, or service endpoints; changes in those areas should receive security-focused review before merge.
 - Review found file, document, data, or media parsing flows; changes in those areas should receive security-focused review before merge.
 - No primary dependency manifest was detected in the repository root. If dependencies are added later, include a manifest and prefer reproducible installation instructions.
+- Travel lists can reveal personal plans and routines. Keep item data local-first unless a future change documents storage, sync, consent, retention, and deletion behavior.
+- `make check` runs a static baseline that guards plist/storyboard metadata, Xcode project wiring, source inventory, item trimming, cell rendering, and logging/network/persistence regressions when Xcode is unavailable.
 
 ## Mobile Privacy Notes
 
