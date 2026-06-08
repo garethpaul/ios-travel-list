@@ -34,6 +34,11 @@ Contribution rules:
 
 ## Security And Privacy
 
+Canonical security policy and reporting:
+
+- [`SECURITY.md`](SECURITY.md)
+
+
 Travel lists can reveal personal plans. The app should remain local by default
 and avoid logging, syncing, or uploading item data without clear user action.
 
