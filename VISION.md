@@ -43,3 +43,6 @@ and avoid logging, syncing, or uploading item data without clear user action.
 - List-content logging
 - Broad project migration mixed with storage behavior changes
 - Generated signing material
+
+This list is a roadmap guardrail, not a permanent rule.
+Strong user demand and strong technical rationale can change it.
