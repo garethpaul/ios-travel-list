@@ -1,5 +1,8 @@
 # ios-travel-list
 
+<!-- README-OVERVIEW-IMAGE -->
+![Project overview](docs/readme-overview.svg)
+
 ## Overview
 
 `garethpaul/ios-travel-list` is an Apple platform application or Swift sample. Travel List so you don't forget things.
@@ -72,4 +75,3 @@ Keep changes small and tied to the project that is already present in this repos
 Prior README summary:
 
 > iOS Travel List <!-- README-OVERVIEW-IMAGE --> <p> A simple travel companion app 💳</p>
-
