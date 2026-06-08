@@ -37,7 +37,7 @@ Contribution rules:
 Travel lists can reveal personal plans. The app should remain local by default
 and avoid logging, syncing, or uploading item data without clear user action.
 
-## What We Will Not Merge For Now
+## What We Will Not Merge (For Now)
 
 - Background sync or upload without privacy design
 - List-content logging
