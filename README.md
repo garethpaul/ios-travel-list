@@ -51,6 +51,7 @@ The checked-in project has no external dependency manifest. Use Xcode for full b
 - Open `TravelList.xcodeproj` in Xcode, choose the app or sample scheme, and run it on the matching simulator/device.
 - The sample is local-first and keeps list items in memory.
 - New item names are trimmed before creation, and whitespace-only entries are ignored.
+- Cell rendering uses a fallback cell that can still display an item if storyboard reuse wiring is unavailable.
 
 ## Testing and Verification
 
@@ -60,7 +61,7 @@ Run the local static baseline:
 make check
 ```
 
-The baseline runs `scripts/check-baseline.py`, parses plist/storyboard/asset metadata, checks image resources and Xcode wiring, verifies item trimming, guarded storyboard casts, table index guards, invalid color fallback, and side-effect-free cell rendering, and guards against logging, network, upload, analytics, or persistence behavior.
+The baseline runs `scripts/check-baseline.py`, parses plist/storyboard/asset metadata, checks image resources and Xcode wiring, verifies item trimming, guarded storyboard casts, configurable fallback cell rendering, table index guards, invalid color fallback, and side-effect-free cell rendering, and guards against logging, network, upload, analytics, or persistence behavior.
 
 For full legacy verification on macOS, use Xcode's test action or `xcodebuild test` with the appropriate scheme and destination.
 
@@ -76,6 +77,7 @@ When the required SDK or runtime is unavailable, use static checks and source re
 - Review changes touching file, media, JSON, XML, CSV, OCR, or data parsing; examples from the scan include TravelList/AddTravelViewController.swift, TravelList/Info.plist, TravelList/TravelListTableViewController.swift, TravelListTests/Info.plist.
 - Travel lists can reveal personal plans. Keep list data local-first unless a future change documents storage, sync, consent, and deletion behavior.
 - Cell rendering should remain side-effect free and validate row indexes before reading list data; avoid reloading the table from inside `cellForRowAtIndexPath`.
+- Keep fallback cell handling configurable so valid rows can still display item text if storyboard reuse wiring changes.
 - Keep storyboard casts, text-field reads, table indexes, and color parsing guarded so malformed local UI state falls back safely.
 
 ## Maintenance Notes

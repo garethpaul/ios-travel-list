@@ -6,6 +6,7 @@
 - Avoided force-unwrapping travel item text and reset pending items before each add segue.
 - Guarded storyboard/table cell casts and invalid delete indexes.
 - Guarded table cell indexes before reading list data during rendering.
+- Switched cell rendering to a configurable fallback cell when storyboard reuse wiring is unavailable.
 - Rejected partial invalid hex color scans so malformed colors fall back to gray.
 - Removed table reload work from cell rendering.
 - Added `make check` and a static Swift/Xcode baseline for plist/storyboard/asset metadata, source inventory, list-flow guardrails, and local-first privacy checks.

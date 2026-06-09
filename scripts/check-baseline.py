@@ -11,6 +11,7 @@ import xml.etree.ElementTree as ET
 ROOT = Path(__file__).resolve().parents[1]
 BASELINE_PLAN = ROOT / "docs/plans/2026-06-08-travel-list-baseline.md"
 CELL_INDEX_PLAN = ROOT / "docs/plans/2026-06-08-cell-index-guard.md"
+CELL_FALLBACK_PLAN = ROOT / "docs/plans/2026-06-08-configurable-cell-fallback.md"
 PNG_SIGNATURE = b"\x89PNG\r\n\x1a\n"
 
 
@@ -88,6 +89,7 @@ def main():
         "TravelListTests/TravelListTests.swift",
         "img/app.png",
         "docs/plans/2026-06-08-cell-index-guard.md",
+        "docs/plans/2026-06-08-configurable-cell-fallback.md",
         "docs/plans/2026-06-08-travel-list-baseline.md",
         "docs/readme-overview.svg",
     ]
@@ -128,6 +130,7 @@ def main():
     gitignore = read(".gitignore")
     baseline_plan = BASELINE_PLAN.read_text(encoding="utf-8") if BASELINE_PLAN.exists() else ""
     cell_index_plan = CELL_INDEX_PLAN.read_text(encoding="utf-8") if CELL_INDEX_PLAN.exists() else ""
+    cell_fallback_plan = CELL_FALLBACK_PLAN.read_text(encoding="utf-8") if CELL_FALLBACK_PLAN.exists() else ""
 
     require(app_plist.get("CFBundleIdentifier", "").startswith("com.garethpaul."),
             "TravelList Info.plist must keep the expected sample bundle identifier",
@@ -160,8 +163,9 @@ def main():
     require("as? AddTravelViewController" in table_controller and "as? TravelListItem" in table_controller,
             "TravelListTableViewController must guard storyboard and item casts",
             failures)
-    require("return UITableViewCell()" in table_controller and "indexPath.row >= self.travelItems.count" in table_controller,
-            "TravelListTableViewController must guard unexpected cell wiring and invalid delete indexes",
+    require("?? UITableViewCell(style: .Default" in table_controller and "return UITableViewCell()" not in table_controller and
+            "indexPath.row >= self.travelItems.count" in table_controller,
+            "TravelListTableViewController must use a configurable fallback cell and guard invalid delete indexes",
             failures)
     cell_method = table_controller.split("cellForRowAtIndexPath", 1)[1].split("didSelectRowAtIndexPath", 1)[0]
     require("indexPath.row >= self.travelItems.count" in cell_method and
@@ -198,19 +202,22 @@ def main():
     require("make check" in readme and "TravelList.xcodeproj" in readme and "local-first" in readme.lower(),
             "README must document static verification, project usage, and local-first behavior",
             failures)
-    require("whitespace" in readme.lower() and "cell rendering" in readme.lower() and "index" in readme.lower() and "color fallback" in readme.lower(),
-            "README must document item trimming, cell rendering, index, and parser guardrails",
+    require("whitespace" in readme.lower() and "cell rendering" in readme.lower() and "index" in readme.lower() and
+            "color fallback" in readme.lower() and "fallback cell" in readme.lower(),
+            "README must document item trimming, cell rendering, fallback cell, index, and parser guardrails",
             failures)
-    require("scripts/check-baseline.py" in vision and "local-first" in vision.lower(),
+    require("scripts/check-baseline.py" in vision and "local-first" in vision.lower() and "fallback cell" in vision.lower(),
             "VISION must describe the current static travel-list baseline",
             failures)
     require("travel lists" in security.lower() and "make check" in security,
             "SECURITY must document travel-list privacy and the static baseline",
             failures)
-    require("whitespace-only" in changes and "hex color" in changes and "cell rendering" in changes and "index" in changes.lower() and "make check" in changes,
-            "CHANGES must record item trimming, parser hardening, cell rendering/index cleanup, and baseline",
+    require("whitespace-only" in changes and "hex color" in changes and "cell rendering" in changes and
+            "fallback cell" in changes.lower() and "index" in changes.lower() and "make check" in changes,
+            "CHANGES must record item trimming, parser hardening, cell rendering/index cleanup, fallback cell, and baseline",
             failures)
-    require("status: completed" in baseline_plan and "status: completed" in cell_index_plan,
+    require("status: completed" in baseline_plan and "status: completed" in cell_index_plan and
+            "status: completed" in cell_fallback_plan,
             "plans must be marked completed",
             failures)
 

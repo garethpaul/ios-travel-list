@@ -61,9 +61,7 @@ class TravelListTableViewController: UITableViewController {
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let CellIndentifier: NSString = "ListPrototypeCell"
         
-        guard let cell = tableView.dequeueReusableCellWithIdentifier(CellIndentifier as String) else {
-            return UITableViewCell()
-        }
+        let cell = tableView.dequeueReusableCellWithIdentifier(CellIndentifier as String) ?? UITableViewCell(style: .Default, reuseIdentifier: CellIndentifier as String)
 
         if indexPath.row >= self.travelItems.count {
             return cell
@@ -100,7 +98,6 @@ class TravelListTableViewController: UITableViewController {
         
     }
 }
-
 
 
 
