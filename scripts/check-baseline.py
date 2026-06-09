@@ -12,6 +12,7 @@ ROOT = Path(__file__).resolve().parents[1]
 BASELINE_PLAN = ROOT / "docs/plans/2026-06-08-travel-list-baseline.md"
 CELL_INDEX_PLAN = ROOT / "docs/plans/2026-06-08-cell-index-guard.md"
 CELL_FALLBACK_PLAN = ROOT / "docs/plans/2026-06-08-configurable-cell-fallback.md"
+CELL_RESET_PLAN = ROOT / "docs/plans/2026-06-08-fallback-cell-reset.md"
 PNG_SIGNATURE = b"\x89PNG\r\n\x1a\n"
 
 
@@ -90,6 +91,7 @@ def main():
         "img/app.png",
         "docs/plans/2026-06-08-cell-index-guard.md",
         "docs/plans/2026-06-08-configurable-cell-fallback.md",
+        "docs/plans/2026-06-08-fallback-cell-reset.md",
         "docs/plans/2026-06-08-travel-list-baseline.md",
         "docs/readme-overview.svg",
     ]
@@ -131,6 +133,7 @@ def main():
     baseline_plan = BASELINE_PLAN.read_text(encoding="utf-8") if BASELINE_PLAN.exists() else ""
     cell_index_plan = CELL_INDEX_PLAN.read_text(encoding="utf-8") if CELL_INDEX_PLAN.exists() else ""
     cell_fallback_plan = CELL_FALLBACK_PLAN.read_text(encoding="utf-8") if CELL_FALLBACK_PLAN.exists() else ""
+    cell_reset_plan = CELL_RESET_PLAN.read_text(encoding="utf-8") if CELL_RESET_PLAN.exists() else ""
 
     require(app_plist.get("CFBundleIdentifier", "").startswith("com.garethpaul."),
             "TravelList Info.plist must keep the expected sample bundle identifier",
@@ -167,9 +170,15 @@ def main():
             "indexPath.row >= self.travelItems.count" in table_controller,
             "TravelListTableViewController must use a configurable fallback cell and guard invalid delete indexes",
             failures)
+    require("func configureCell(cell: UITableViewCell, withTravelItem travelItem: TravelListItem?) -> UITableViewCell" in table_controller and
+            'cell.textLabel?.text = ""' in table_controller and
+            "return configureCell(cell, withTravelItem: nil)" in table_controller and
+            "return configureCell(cell, withTravelItem: travelItem)" in table_controller,
+            "TravelListTableViewController must clear fallback cells before returning invalid or malformed rows",
+            failures)
     cell_method = table_controller.split("cellForRowAtIndexPath", 1)[1].split("didSelectRowAtIndexPath", 1)[0]
     require("indexPath.row >= self.travelItems.count" in cell_method and
-            "return cell" in cell_method.split("indexPath.row >= self.travelItems.count", 1)[1],
+            "return configureCell(cell, withTravelItem: nil)" in cell_method.split("indexPath.row >= self.travelItems.count", 1)[1],
             "cellForRowAtIndexPath must guard invalid indexes before reading travelItems",
             failures)
     require("reloadData" not in cell_method,
@@ -203,21 +212,23 @@ def main():
             "README must document static verification, project usage, and local-first behavior",
             failures)
     require("whitespace" in readme.lower() and "cell rendering" in readme.lower() and "index" in readme.lower() and
-            "color fallback" in readme.lower() and "fallback cell" in readme.lower(),
-            "README must document item trimming, cell rendering, fallback cell, index, and parser guardrails",
+            "color fallback" in readme.lower() and "fallback cell" in readme.lower() and "stale cell" in readme.lower(),
+            "README must document item trimming, cell rendering, fallback cell reset, index, and parser guardrails",
             failures)
-    require("scripts/check-baseline.py" in vision and "local-first" in vision.lower() and "fallback cell" in vision.lower(),
+    require("scripts/check-baseline.py" in vision and "local-first" in vision.lower() and
+            "fallback cell" in vision.lower() and "stale cell" in vision.lower(),
             "VISION must describe the current static travel-list baseline",
             failures)
-    require("travel lists" in security.lower() and "make check" in security,
+    require("travel lists" in security.lower() and "make check" in security and "stale cell" in security.lower(),
             "SECURITY must document travel-list privacy and the static baseline",
             failures)
     require("whitespace-only" in changes and "hex color" in changes and "cell rendering" in changes and
-            "fallback cell" in changes.lower() and "index" in changes.lower() and "make check" in changes,
-            "CHANGES must record item trimming, parser hardening, cell rendering/index cleanup, fallback cell, and baseline",
+            "fallback cell" in changes.lower() and "stale cell" in changes.lower() and
+            "index" in changes.lower() and "make check" in changes,
+            "CHANGES must record item trimming, parser hardening, cell rendering/index cleanup, fallback cell reset, and baseline",
             failures)
     require("status: completed" in baseline_plan and "status: completed" in cell_index_plan and
-            "status: completed" in cell_fallback_plan,
+            "status: completed" in cell_fallback_plan and "status: completed" in cell_reset_plan,
             "plans must be marked completed",
             failures)
 

@@ -64,13 +64,24 @@ class TravelListTableViewController: UITableViewController {
         let cell = tableView.dequeueReusableCellWithIdentifier(CellIndentifier as String) ?? UITableViewCell(style: .Default, reuseIdentifier: CellIndentifier as String)
 
         if indexPath.row >= self.travelItems.count {
-            return cell
+            return configureCell(cell, withTravelItem: nil)
         }
         
         guard let travelItem = self.travelItems.objectAtIndex(indexPath.row) as? TravelListItem else {
+            return configureCell(cell, withTravelItem: nil)
+        }
+
+        return configureCell(cell, withTravelItem: travelItem)
+    }
+
+    func configureCell(cell: UITableViewCell, withTravelItem travelItem: TravelListItem?) -> UITableViewCell {
+        guard let travelItem = travelItem else {
+            cell.textLabel?.text = ""
+            cell.textLabel?.textColor = UIColor.whiteColor()
+            cell.accessoryType = .None
             return cell
         }
-        
+
         cell.textLabel?.text = travelItem.itemName as String
         cell.textLabel?.textColor = UIColor.whiteColor()
 
@@ -98,7 +109,6 @@ class TravelListTableViewController: UITableViewController {
         
     }
 }
-
 
 
 
