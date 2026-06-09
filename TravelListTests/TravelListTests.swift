@@ -4,29 +4,17 @@
 //
 
 import XCTest
+@testable import TravelList
 
 class MyAppTests: XCTestCase {
-    
-    override func setUp() {
-        super.setUp()
-        // Put setup code here. This method is called before the invocation of each test method in the class.
+
+    func testTravelItemNameNormalizationTrimsWhitespace() {
+        XCTAssertEqual(TravelListItem.normalizedName("  Passport\n")!, "Passport", "Travel item names should be trimmed before saving")
     }
-    
-    override func tearDown() {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
-        super.tearDown()
+
+    func testTravelItemNameNormalizationRejectsBlankNames() {
+        XCTAssertNil(TravelListItem.normalizedName("  \n\t  "), "Blank travel item names should be ignored")
+        XCTAssertNil(TravelListItem.normalizedName(nil), "Missing travel item names should be ignored")
     }
-    
-    func testExample() {
-        // This is an example of a functional test case.
-        XCTAssert(true, "Pass")
-    }
-    
-    func testPerformanceExample() {
-        // This is an example of a performance test case.
-        self.measureBlock() {
-            // Put the code you want to measure the time of here.
-        }
-    }
-    
+
 }

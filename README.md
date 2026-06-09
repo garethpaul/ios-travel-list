@@ -51,6 +51,7 @@ The checked-in project has no external dependency manifest. Use Xcode for full b
 - Open `TravelList.xcodeproj` in Xcode, choose the app or sample scheme, and run it on the matching simulator/device.
 - The sample is local-first and keeps list items in memory.
 - New item names go through a shared name normalizer before creation, and whitespace-only entries are ignored.
+- Focused normalizer tests cover trimmed, blank, and missing travel item names.
 - Cell rendering uses a fallback cell that can still display an item if storyboard reuse wiring is unavailable.
 - Invalid or malformed rows clear stale cell text and accessory state before the fallback cell is returned.
 
@@ -62,7 +63,7 @@ Run the local static baseline:
 make check
 ```
 
-The baseline runs `scripts/check-baseline.py`, parses plist/storyboard/asset metadata, checks image resources and Xcode wiring, verifies the shared name normalizer, guarded storyboard casts, configurable fallback cell rendering, stale cell reset handling, table index guards, invalid color fallback, and side-effect-free cell rendering, and guards against logging, network, upload, analytics, or persistence behavior.
+The baseline runs `scripts/check-baseline.py`, parses plist/storyboard/asset metadata, checks image resources and Xcode wiring, verifies the shared name normalizer, normalizer tests, guarded storyboard casts, configurable fallback cell rendering, stale cell reset handling, table index guards, invalid color fallback, and side-effect-free cell rendering, and guards against logging, network, upload, analytics, or persistence behavior.
 
 For full legacy verification on macOS, use Xcode's test action or `xcodebuild test` with the appropriate scheme and destination.
 
@@ -88,6 +89,7 @@ When the required SDK or runtime is unavailable, use static checks and source re
 - See `SECURITY.md` for vulnerability reporting and safe research guidance.
 - See `VISION.md` for project direction and contribution guardrails.
 - See `docs/plans/2026-06-09-travel-item-name-normalizer.md` for the shared name normalizer guardrail.
+- See `docs/plans/2026-06-09-travel-item-normalizer-tests.md` for the normalizer tests guardrail.
 - Run `make check` before pushing changes to Swift sources, plist/storyboard files, image assets, Xcode metadata, list flow, or privacy documentation.
 
 ## Contributing
