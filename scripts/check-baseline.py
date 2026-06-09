@@ -15,6 +15,7 @@ CELL_FALLBACK_PLAN = ROOT / "docs/plans/2026-06-08-configurable-cell-fallback.md
 CELL_RESET_PLAN = ROOT / "docs/plans/2026-06-08-fallback-cell-reset.md"
 ITEM_NORMALIZER_PLAN = ROOT / "docs/plans/2026-06-09-travel-item-name-normalizer.md"
 ITEM_NORMALIZER_TESTS_PLAN = ROOT / "docs/plans/2026-06-09-travel-item-normalizer-tests.md"
+ITEM_REMOVAL_PLAN = ROOT / "docs/plans/2026-06-09-travel-item-removal-index-guard.md"
 PNG_SIGNATURE = b"\x89PNG\r\n\x1a\n"
 
 
@@ -97,6 +98,7 @@ def main():
         "docs/plans/2026-06-08-travel-list-baseline.md",
         "docs/plans/2026-06-09-travel-item-name-normalizer.md",
         "docs/plans/2026-06-09-travel-item-normalizer-tests.md",
+        "docs/plans/2026-06-09-travel-item-removal-index-guard.md",
         "docs/readme-overview.svg",
     ]
 
@@ -141,6 +143,7 @@ def main():
     cell_reset_plan = CELL_RESET_PLAN.read_text(encoding="utf-8") if CELL_RESET_PLAN.exists() else ""
     item_normalizer_plan = ITEM_NORMALIZER_PLAN.read_text(encoding="utf-8") if ITEM_NORMALIZER_PLAN.exists() else ""
     item_normalizer_tests_plan = ITEM_NORMALIZER_TESTS_PLAN.read_text(encoding="utf-8") if ITEM_NORMALIZER_TESTS_PLAN.exists() else ""
+    item_removal_plan = ITEM_REMOVAL_PLAN.read_text(encoding="utf-8") if ITEM_REMOVAL_PLAN.exists() else ""
 
     require(app_plist.get("CFBundleIdentifier", "").startswith("com.garethpaul."),
             "TravelList Info.plist must keep the expected sample bundle identifier",
@@ -170,9 +173,11 @@ def main():
             failures)
     require("testTravelItemNameNormalizationTrimsWhitespace" in tests and
             "testTravelItemNameNormalizationRejectsBlankNames" in tests and
+            "testRemoveTravelItemAtIndexRemovesValidItem" in tests and
+            "testRemoveTravelItemAtIndexRejectsInvalidIndexes" in tests and
             "XCTAssertEqual" in tests and "XCTAssertNil" in tests and
             "XCTAssert(true" not in tests and "testPerformanceExample" not in tests,
-            "TravelListTests must replace template tests with travel item name normalization assertions",
+            "TravelListTests must replace template tests with travel item normalization and removal assertions",
             failures)
     require("travelItem = nil" in add_controller and "TravelListItem.normalizedName(self.textfield.text)" in add_controller,
             "AddTravelViewController must avoid force-unwrapping text and clear stale pending items",
@@ -190,6 +195,12 @@ def main():
     require("?? UITableViewCell(style: .Default" in table_controller and "return UITableViewCell()" not in table_controller and
             "indexPath.row >= self.travelItems.count" in table_controller,
             "TravelListTableViewController must use a configurable fallback cell and guard invalid delete indexes",
+            failures)
+    require("func removeTravelItemAtIndex(index: Int) -> Bool" in table_controller and
+            "index < 0 || index >= self.travelItems.count" in table_controller and
+            "self.travelItems.removeObjectAtIndex(index)" in table_controller and
+            "if self.removeTravelItemAtIndex(indexPath.row)" in table_controller,
+            "TravelListTableViewController must remove items through a guarded index helper",
             failures)
     require("func configureCell(cell: UITableViewCell, withTravelItem travelItem: TravelListItem?) -> UITableViewCell" in table_controller and
             'cell.textLabel?.text = ""' in table_controller and
@@ -239,6 +250,9 @@ def main():
     require("normalizer tests" in readme.lower(),
             "README must document travel item normalizer tests",
             failures)
+    require("removal index" in readme.lower(),
+            "README must document travel item removal index guardrails",
+            failures)
     require("scripts/check-baseline.py" in vision and "local-first" in vision.lower() and
             "fallback cell" in vision.lower() and "stale cell" in vision.lower() and "name normalizer" in vision.lower(),
             "VISION must describe the current static travel-list baseline",
@@ -246,8 +260,11 @@ def main():
     require("normalizer tests" in vision.lower(),
             "VISION must describe travel item normalizer tests",
             failures)
+    require("removal index" in vision.lower(),
+            "VISION must describe travel item removal index guardrails",
+            failures)
     require("travel lists" in security.lower() and "make check" in security and "stale cell" in security.lower() and
-            "name normalizer" in security.lower() and "normalizer tests" in security.lower(),
+            "name normalizer" in security.lower() and "normalizer tests" in security.lower() and "removal index" in security.lower(),
             "SECURITY must document travel-list privacy and the static baseline",
             failures)
     require("whitespace-only" in changes and "hex color" in changes and "cell rendering" in changes and
@@ -258,6 +275,9 @@ def main():
     require("normalizer tests" in changes.lower(),
             "CHANGES must record travel item normalizer test updates",
             failures)
+    require("removal index" in changes.lower(),
+            "CHANGES must record travel item removal index updates",
+            failures)
     require("status: completed" in baseline_plan and "status: completed" in cell_index_plan and
             "status: completed" in cell_fallback_plan and "status: completed" in cell_reset_plan,
             "plans must be marked completed",
@@ -267,6 +287,9 @@ def main():
             failures)
     require("status: completed" in item_normalizer_tests_plan,
             "travel item normalizer tests plan must be marked completed",
+            failures)
+    require("status: completed" in item_removal_plan,
+            "travel item removal index guard plan must be marked completed",
             failures)
 
     if shutil.which("xcodebuild"):

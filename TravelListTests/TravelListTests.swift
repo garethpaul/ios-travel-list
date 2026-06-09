@@ -17,4 +17,21 @@ class MyAppTests: XCTestCase {
         XCTAssertNil(TravelListItem.normalizedName(nil), "Missing travel item names should be ignored")
     }
 
+    func testRemoveTravelItemAtIndexRemovesValidItem() {
+        let controller = TravelListTableViewController()
+        controller.travelItems.addObject(TravelListItem(name: "Passport"))
+
+        XCTAssertTrue(controller.removeTravelItemAtIndex(0), "Valid travel item indexes should be removable")
+        XCTAssertEqual(controller.travelItems.count, 0, "Removing a valid item should update the local list")
+    }
+
+    func testRemoveTravelItemAtIndexRejectsInvalidIndexes() {
+        let controller = TravelListTableViewController()
+        controller.travelItems.addObject(TravelListItem(name: "Passport"))
+
+        XCTAssertFalse(controller.removeTravelItemAtIndex(-1), "Negative travel item indexes should not be removed")
+        XCTAssertFalse(controller.removeTravelItemAtIndex(1), "Out-of-range travel item indexes should not be removed")
+        XCTAssertEqual(controller.travelItems.count, 1, "Invalid item removal should leave the local list unchanged")
+    }
+
 }

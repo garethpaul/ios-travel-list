@@ -54,6 +54,7 @@ The checked-in project has no external dependency manifest. Use Xcode for full b
 - Focused normalizer tests cover trimmed, blank, and missing travel item names.
 - Cell rendering uses a fallback cell that can still display an item if storyboard reuse wiring is unavailable.
 - Invalid or malformed rows clear stale cell text and accessory state before the fallback cell is returned.
+- Item removal index checks reject stale or invalid row selections before mutating the local list.
 
 ## Testing and Verification
 
@@ -63,7 +64,7 @@ Run the local static baseline:
 make check
 ```
 
-The baseline runs `scripts/check-baseline.py`, parses plist/storyboard/asset metadata, checks image resources and Xcode wiring, verifies the shared name normalizer, normalizer tests, guarded storyboard casts, configurable fallback cell rendering, stale cell reset handling, table index guards, invalid color fallback, and side-effect-free cell rendering, and guards against logging, network, upload, analytics, or persistence behavior.
+The baseline runs `scripts/check-baseline.py`, parses plist/storyboard/asset metadata, checks image resources and Xcode wiring, verifies the shared name normalizer, normalizer tests, guarded storyboard casts, configurable fallback cell rendering, stale cell reset handling, table index guards, removal index guards, invalid color fallback, and side-effect-free cell rendering, and guards against logging, network, upload, analytics, or persistence behavior.
 
 For full legacy verification on macOS, use Xcode's test action or `xcodebuild test` with the appropriate scheme and destination.
 
@@ -90,6 +91,7 @@ When the required SDK or runtime is unavailable, use static checks and source re
 - See `VISION.md` for project direction and contribution guardrails.
 - See `docs/plans/2026-06-09-travel-item-name-normalizer.md` for the shared name normalizer guardrail.
 - See `docs/plans/2026-06-09-travel-item-normalizer-tests.md` for the normalizer tests guardrail.
+- See `docs/plans/2026-06-09-travel-item-removal-index-guard.md` for the removal index guardrail.
 - Run `make check` before pushing changes to Swift sources, plist/storyboard files, image assets, Xcode metadata, list flow, or privacy documentation.
 
 ## Contributing

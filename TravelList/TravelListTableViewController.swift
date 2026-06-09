@@ -98,18 +98,24 @@ class TravelListTableViewController: UITableViewController {
         
         return cell
     }
+
+    func removeTravelItemAtIndex(index: Int) -> Bool {
+        if index < 0 || index >= self.travelItems.count {
+            return false
+        }
+
+        self.travelItems.removeObjectAtIndex(index)
+        return true
+    }
     
     override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         tableView.deselectRowAtIndexPath(indexPath, animated: false)
-        if indexPath.row >= self.travelItems.count {
-            return
+        if self.removeTravelItemAtIndex(indexPath.row) {
+            tableView.reloadData()
         }
-        self.travelItems.removeObjectAtIndex(indexPath.row)
-        tableView.reloadData()
         
     }
 }
-
 
 
 

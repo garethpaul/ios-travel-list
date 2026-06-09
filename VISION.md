@@ -21,6 +21,7 @@ Priority:
 - Avoid syncing or uploading travel-list data without explicit design
 - Keep normalizer tests focused on trimmed, blank, and missing travel item names
 - Keep table rendering guarded against stale local indexes
+- Keep item removal index handling guarded before local list mutation
 - Keep fallback cell rendering configurable for valid rows
 - Clear stale cell state when invalid or malformed rows use fallback cells
 - Maintain a small Xcode project structure
@@ -52,9 +53,10 @@ and avoid logging, syncing, or uploading item data without clear user action.
 Current baseline: `make check` runs `scripts/check-baseline.py` without Xcode.
 It verifies plist/storyboard/asset metadata, local-first list flow, whitespace
 trimming through a shared name normalizer, normalizer tests, guarded
-storyboard/table flows, cell index checks, side-effect-free cell rendering,
-fallback cell handling, stale cell reset handling, invalid color fallback, and no
-logging, network, upload, analytics, or persistence behavior.
+storyboard/table flows, cell index checks, removal index checks,
+side-effect-free cell rendering, fallback cell handling, stale cell reset
+handling, invalid color fallback, and no logging, network, upload, analytics, or
+persistence behavior.
 
 ## What We Will Not Merge (For Now)
 

@@ -1,5 +1,10 @@
 # Changes
 
+## 2026-06-09
+
+- Added a removal index guard so invalid travel item selections do not mutate
+  the local list.
+
 ## 2026-06-08
 
 - Trimmed new travel item names before accepting them so whitespace-only entries are ignored.
