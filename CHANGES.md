@@ -3,6 +3,7 @@
 ## 2026-06-08
 
 - Trimmed new travel item names before accepting them so whitespace-only entries are ignored.
+- Moved travel item trimming into a shared name normalizer on the model.
 - Avoided force-unwrapping travel item text and reset pending items before each add segue.
 - Guarded storyboard/table cell casts and invalid delete indexes.
 - Guarded table cell indexes before reading list data during rendering.

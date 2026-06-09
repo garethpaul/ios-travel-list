@@ -13,4 +13,12 @@ class TravelListItem: NSObject{
         self.itemName = name
     }
 
+    class func normalizedName(name: String?) -> String? {
+        if let itemName = name?.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet()) where !itemName.isEmpty {
+            return itemName
+        }
+
+        return nil
+    }
+
 }

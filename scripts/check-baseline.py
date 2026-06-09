@@ -13,6 +13,7 @@ BASELINE_PLAN = ROOT / "docs/plans/2026-06-08-travel-list-baseline.md"
 CELL_INDEX_PLAN = ROOT / "docs/plans/2026-06-08-cell-index-guard.md"
 CELL_FALLBACK_PLAN = ROOT / "docs/plans/2026-06-08-configurable-cell-fallback.md"
 CELL_RESET_PLAN = ROOT / "docs/plans/2026-06-08-fallback-cell-reset.md"
+ITEM_NORMALIZER_PLAN = ROOT / "docs/plans/2026-06-09-travel-item-name-normalizer.md"
 PNG_SIGNATURE = b"\x89PNG\r\n\x1a\n"
 
 
@@ -93,6 +94,7 @@ def main():
         "docs/plans/2026-06-08-configurable-cell-fallback.md",
         "docs/plans/2026-06-08-fallback-cell-reset.md",
         "docs/plans/2026-06-08-travel-list-baseline.md",
+        "docs/plans/2026-06-09-travel-item-name-normalizer.md",
         "docs/readme-overview.svg",
     ]
 
@@ -134,6 +136,7 @@ def main():
     cell_index_plan = CELL_INDEX_PLAN.read_text(encoding="utf-8") if CELL_INDEX_PLAN.exists() else ""
     cell_fallback_plan = CELL_FALLBACK_PLAN.read_text(encoding="utf-8") if CELL_FALLBACK_PLAN.exists() else ""
     cell_reset_plan = CELL_RESET_PLAN.read_text(encoding="utf-8") if CELL_RESET_PLAN.exists() else ""
+    item_normalizer_plan = ITEM_NORMALIZER_PLAN.read_text(encoding="utf-8") if ITEM_NORMALIZER_PLAN.exists() else ""
 
     require(app_plist.get("CFBundleIdentifier", "").startswith("com.garethpaul."),
             "TravelList Info.plist must keep the expected sample bundle identifier",
@@ -150,13 +153,18 @@ def main():
     require("TravelListTableViewController" in storyboard and "AddTravelViewController" in storyboard and "unwindToList" in storyboard,
             "Storyboard must keep the list/add/unwind flow wired",
             failures)
-    require("stringByTrimmingCharactersInSet" in add_controller and "whitespaceAndNewlineCharacterSet" in add_controller,
-            "AddTravelViewController must trim item names before accepting them",
+    require("TravelListItem.normalizedName(self.textfield.text)" in add_controller,
+            "AddTravelViewController must normalize item names before accepting them",
             failures)
-    require("travelItem = nil" in add_controller and "text?.stringByTrimmingCharactersInSet" in add_controller,
+    require("class func normalizedName(name: String?) -> String?" in item_model and
+            "stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet())" in item_model and
+            "itemName.isEmpty" in item_model and "return nil" in item_model,
+            "TravelListItem must expose a shared optional name normalizer",
+            failures)
+    require("travelItem = nil" in add_controller and "TravelListItem.normalizedName(self.textfield.text)" in add_controller,
             "AddTravelViewController must avoid force-unwrapping text and clear stale pending items",
             failures)
-    require("!itemName.isEmpty" in add_controller and "TravelListItem(name: itemName)" in add_controller,
+    require("!itemName.isEmpty" in item_model and "TravelListItem(name: itemName)" in add_controller,
             "AddTravelViewController must reject whitespace-only items",
             failures)
     hex_source = read("TravelList/Hex.swift")
@@ -212,24 +220,27 @@ def main():
             "README must document static verification, project usage, and local-first behavior",
             failures)
     require("whitespace" in readme.lower() and "cell rendering" in readme.lower() and "index" in readme.lower() and
-            "color fallback" in readme.lower() and "fallback cell" in readme.lower() and "stale cell" in readme.lower(),
+            "color fallback" in readme.lower() and "fallback cell" in readme.lower() and "stale cell" in readme.lower() and "name normalizer" in readme.lower(),
             "README must document item trimming, cell rendering, fallback cell reset, index, and parser guardrails",
             failures)
     require("scripts/check-baseline.py" in vision and "local-first" in vision.lower() and
-            "fallback cell" in vision.lower() and "stale cell" in vision.lower(),
+            "fallback cell" in vision.lower() and "stale cell" in vision.lower() and "name normalizer" in vision.lower(),
             "VISION must describe the current static travel-list baseline",
             failures)
-    require("travel lists" in security.lower() and "make check" in security and "stale cell" in security.lower(),
+    require("travel lists" in security.lower() and "make check" in security and "stale cell" in security.lower() and "name normalizer" in security.lower(),
             "SECURITY must document travel-list privacy and the static baseline",
             failures)
     require("whitespace-only" in changes and "hex color" in changes and "cell rendering" in changes and
             "fallback cell" in changes.lower() and "stale cell" in changes.lower() and
-            "index" in changes.lower() and "make check" in changes,
+            "index" in changes.lower() and "name normalizer" in changes.lower() and "make check" in changes,
             "CHANGES must record item trimming, parser hardening, cell rendering/index cleanup, fallback cell reset, and baseline",
             failures)
     require("status: completed" in baseline_plan and "status: completed" in cell_index_plan and
             "status: completed" in cell_fallback_plan and "status: completed" in cell_reset_plan,
             "plans must be marked completed",
+            failures)
+    require("status: completed" in item_normalizer_plan,
+            "travel item name normalizer plan must be marked completed",
             failures)
 
     if shutil.which("xcodebuild"):

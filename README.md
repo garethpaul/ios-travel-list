@@ -50,7 +50,7 @@ The checked-in project has no external dependency manifest. Use Xcode for full b
 
 - Open `TravelList.xcodeproj` in Xcode, choose the app or sample scheme, and run it on the matching simulator/device.
 - The sample is local-first and keeps list items in memory.
-- New item names are trimmed before creation, and whitespace-only entries are ignored.
+- New item names go through a shared name normalizer before creation, and whitespace-only entries are ignored.
 - Cell rendering uses a fallback cell that can still display an item if storyboard reuse wiring is unavailable.
 - Invalid or malformed rows clear stale cell text and accessory state before the fallback cell is returned.
 
@@ -62,7 +62,7 @@ Run the local static baseline:
 make check
 ```
 
-The baseline runs `scripts/check-baseline.py`, parses plist/storyboard/asset metadata, checks image resources and Xcode wiring, verifies item trimming, guarded storyboard casts, configurable fallback cell rendering, stale cell reset handling, table index guards, invalid color fallback, and side-effect-free cell rendering, and guards against logging, network, upload, analytics, or persistence behavior.
+The baseline runs `scripts/check-baseline.py`, parses plist/storyboard/asset metadata, checks image resources and Xcode wiring, verifies the shared name normalizer, guarded storyboard casts, configurable fallback cell rendering, stale cell reset handling, table index guards, invalid color fallback, and side-effect-free cell rendering, and guards against logging, network, upload, analytics, or persistence behavior.
 
 For full legacy verification on macOS, use Xcode's test action or `xcodebuild test` with the appropriate scheme and destination.
 
@@ -87,6 +87,7 @@ When the required SDK or runtime is unavailable, use static checks and source re
 - This looks like an Apple platform project or sample. Xcode, Swift, CocoaPods, and deployment target versions may need to match the original project era.
 - See `SECURITY.md` for vulnerability reporting and safe research guidance.
 - See `VISION.md` for project direction and contribution guardrails.
+- See `docs/plans/2026-06-09-travel-item-name-normalizer.md` for the shared name normalizer guardrail.
 - Run `make check` before pushing changes to Swift sources, plist/storyboard files, image assets, Xcode metadata, list flow, or privacy documentation.
 
 ## Contributing
