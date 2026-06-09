@@ -3,6 +3,11 @@
 <!-- README-OVERVIEW-IMAGE -->
 ![Project overview](docs/readme-overview.svg)
 
+## Device Preview
+
+<!-- DEVICE-PREVIEW-IMAGE -->
+![Device preview](docs/device-preview.svg)
+
 ## Overview
 
 `garethpaul/ios-travel-list` is an Apple platform application or Swift sample. Travel List so you don't forget things.
