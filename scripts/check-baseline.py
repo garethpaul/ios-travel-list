@@ -17,6 +17,7 @@ ITEM_NORMALIZER_PLAN = ROOT / "docs/plans/2026-06-09-travel-item-name-normalizer
 ITEM_NORMALIZER_TESTS_PLAN = ROOT / "docs/plans/2026-06-09-travel-item-normalizer-tests.md"
 ITEM_REMOVAL_PLAN = ROOT / "docs/plans/2026-06-09-travel-item-removal-index-guard.md"
 MAKE_GATES_PLAN = ROOT / "docs/plans/2026-06-09-make-gate-aliases.md"
+NAV_LOGO_PLAN = ROOT / "docs/plans/2026-06-09-navigation-logo-title-view.md"
 PNG_SIGNATURE = b"\x89PNG\r\n\x1a\n"
 
 
@@ -101,6 +102,7 @@ def main():
         "docs/plans/2026-06-09-travel-item-normalizer-tests.md",
         "docs/plans/2026-06-09-travel-item-removal-index-guard.md",
         "docs/plans/2026-06-09-make-gate-aliases.md",
+        "docs/plans/2026-06-09-navigation-logo-title-view.md",
         "docs/readme-overview.svg",
     ]
 
@@ -148,6 +150,7 @@ def main():
     item_normalizer_tests_plan = ITEM_NORMALIZER_TESTS_PLAN.read_text(encoding="utf-8") if ITEM_NORMALIZER_TESTS_PLAN.exists() else ""
     item_removal_plan = ITEM_REMOVAL_PLAN.read_text(encoding="utf-8") if ITEM_REMOVAL_PLAN.exists() else ""
     make_gates_plan = MAKE_GATES_PLAN.read_text(encoding="utf-8") if MAKE_GATES_PLAN.exists() else ""
+    nav_logo_plan = NAV_LOGO_PLAN.read_text(encoding="utf-8") if NAV_LOGO_PLAN.exists() else ""
 
     require(app_plist.get("CFBundleIdentifier", "").startswith("com.garethpaul."),
             "TravelList Info.plist must keep the expected sample bundle identifier",
@@ -170,6 +173,16 @@ def main():
     require("TravelListItem.normalizedName(self.textfield.text)" in add_controller,
             "AddTravelViewController must normalize item names before accepting them",
             failures)
+    for controller_name, controller_source in {
+        "TravelListTableViewController": table_controller,
+        "AddTravelViewController": add_controller,
+    }.items():
+        require("self.navigationItem.titleView = logoView" in controller_source and
+                "navigationController?.view.addSubview(logoView)" not in controller_source and
+                "bringSubviewToFront(logoView)" not in controller_source and
+                "logoView.frame.origin" not in controller_source,
+                f"{controller_name} must scope the travel logo to the navigation item title view",
+                failures)
     require("class func normalizedName(name: String?) -> String?" in item_model and
             "stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet())" in item_model and
             "itemName.isEmpty" in item_model and "return nil" in item_model,
@@ -252,7 +265,7 @@ def main():
             "README must document static verification gates, project usage, and local-first behavior",
             failures)
     require("whitespace" in readme.lower() and "cell rendering" in readme.lower() and "index" in readme.lower() and
-            "color fallback" in readme.lower() and "fallback cell" in readme.lower() and "stale cell" in readme.lower() and "name normalizer" in readme.lower(),
+            "color fallback" in readme.lower() and "fallback cell" in readme.lower() and "stale cell" in readme.lower() and "name normalizer" in readme.lower() and "title view" in readme.lower(),
             "README must document item trimming, cell rendering, fallback cell reset, index, and parser guardrails",
             failures)
     require("normalizer tests" in readme.lower(),
@@ -263,7 +276,7 @@ def main():
             failures)
     require("scripts/check-baseline.py" in vision and "make lint" in vision and "make test" in vision and
             "make build" in vision and "local-first" in vision.lower() and
-            "fallback cell" in vision.lower() and "stale cell" in vision.lower() and "name normalizer" in vision.lower(),
+            "fallback cell" in vision.lower() and "stale cell" in vision.lower() and "name normalizer" in vision.lower() and "title view" in vision.lower(),
             "VISION must describe the current static travel-list baseline",
             failures)
     require("normalizer tests" in vision.lower(),
@@ -273,11 +286,11 @@ def main():
             "VISION must describe travel item removal index guardrails",
             failures)
     require("travel lists" in security.lower() and "make check" in security and "stale cell" in security.lower() and
-            "name normalizer" in security.lower() and "normalizer tests" in security.lower() and "removal index" in security.lower(),
+            "name normalizer" in security.lower() and "normalizer tests" in security.lower() and "removal index" in security.lower() and "title view" in security.lower(),
             "SECURITY must document travel-list privacy and the static baseline",
             failures)
     require("whitespace-only" in changes and "hex color" in changes and "cell rendering" in changes and
-            "fallback cell" in changes.lower() and "stale cell" in changes.lower() and
+            "fallback cell" in changes.lower() and "stale cell" in changes.lower() and "title view" in changes.lower() and
             "index" in changes.lower() and "name normalizer" in changes.lower() and "make check" in changes,
             "CHANGES must record item trimming, parser hardening, cell rendering/index cleanup, fallback cell reset, and baseline",
             failures)
@@ -305,6 +318,9 @@ def main():
             failures)
     require("status: completed" in make_gates_plan,
             "make gate aliases plan must be marked completed",
+            failures)
+    require("status: completed" in nav_logo_plan,
+            "navigation logo title-view plan must be marked completed",
             failures)
 
     if shutil.which("xcodebuild"):

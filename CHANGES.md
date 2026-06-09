@@ -6,6 +6,8 @@
   static Travel List baseline.
 - Added a removal index guard so invalid travel item selections do not mutate
   the local list.
+- Scoped the travel logo to each navigation item title view instead of adding
+  navigation-controller overlay subviews.
 
 ## 2026-06-08
 
