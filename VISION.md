@@ -25,6 +25,8 @@ Priority:
 - Keep fallback cell rendering configurable for valid rows
 - Clear stale cell state when invalid or malformed rows use fallback cells
 - Maintain a small Xcode project structure
+- Keep `make lint`, `make test`, `make build`, and `make check` available as
+  local verification gates
 - Keep `scripts/check-baseline.py` passing for local-first list behavior,
   item trimming, storyboard wiring, Xcode metadata, and source inventory
 
@@ -38,6 +40,8 @@ Contribution rules:
 
 - One PR = one focused list, UI, storage, test, or documentation change.
 - Verify app flow after storyboard or controller changes.
+- Run `make lint`, `make test`, `make build`, and `make check` before pushing
+  source, project metadata, asset, list-flow, or privacy changes.
 - Keep generated build products and signing files out of git.
 - Document any change that stores or transmits list data.
 
@@ -50,11 +54,11 @@ Canonical security policy and reporting:
 Travel lists can reveal personal plans. The app should remain local by default
 and avoid logging, syncing, or uploading item data without clear user action.
 
-Current baseline: `make check` runs `scripts/check-baseline.py` without Xcode.
-It verifies plist/storyboard/asset metadata, local-first list flow, whitespace
-trimming through a shared name normalizer, normalizer tests, guarded
-storyboard/table flows, cell index checks, removal index checks,
-side-effect-free cell rendering, fallback cell handling, stale cell reset
+Current baseline: `make lint`, `make test`, `make build`, and `make check` run
+`scripts/check-baseline.py` without Xcode. They verify plist/storyboard/asset
+metadata, local-first list flow, whitespace trimming through a shared name normalizer,
+normalizer tests, guarded storyboard/table flows, cell index checks, removal index
+checks, side-effect-free cell rendering, fallback cell handling, stale cell reset
 handling, invalid color fallback, and no logging, network, upload, analytics, or
 persistence behavior.
 

@@ -16,6 +16,7 @@ CELL_RESET_PLAN = ROOT / "docs/plans/2026-06-08-fallback-cell-reset.md"
 ITEM_NORMALIZER_PLAN = ROOT / "docs/plans/2026-06-09-travel-item-name-normalizer.md"
 ITEM_NORMALIZER_TESTS_PLAN = ROOT / "docs/plans/2026-06-09-travel-item-normalizer-tests.md"
 ITEM_REMOVAL_PLAN = ROOT / "docs/plans/2026-06-09-travel-item-removal-index-guard.md"
+MAKE_GATES_PLAN = ROOT / "docs/plans/2026-06-09-make-gate-aliases.md"
 PNG_SIGNATURE = b"\x89PNG\r\n\x1a\n"
 
 
@@ -99,6 +100,7 @@ def main():
         "docs/plans/2026-06-09-travel-item-name-normalizer.md",
         "docs/plans/2026-06-09-travel-item-normalizer-tests.md",
         "docs/plans/2026-06-09-travel-item-removal-index-guard.md",
+        "docs/plans/2026-06-09-make-gate-aliases.md",
         "docs/readme-overview.svg",
     ]
 
@@ -137,6 +139,7 @@ def main():
     security = read("SECURITY.md")
     changes = read("CHANGES.md")
     gitignore = read(".gitignore")
+    makefile = read("Makefile")
     baseline_plan = BASELINE_PLAN.read_text(encoding="utf-8") if BASELINE_PLAN.exists() else ""
     cell_index_plan = CELL_INDEX_PLAN.read_text(encoding="utf-8") if CELL_INDEX_PLAN.exists() else ""
     cell_fallback_plan = CELL_FALLBACK_PLAN.read_text(encoding="utf-8") if CELL_FALLBACK_PLAN.exists() else ""
@@ -144,6 +147,7 @@ def main():
     item_normalizer_plan = ITEM_NORMALIZER_PLAN.read_text(encoding="utf-8") if ITEM_NORMALIZER_PLAN.exists() else ""
     item_normalizer_tests_plan = ITEM_NORMALIZER_TESTS_PLAN.read_text(encoding="utf-8") if ITEM_NORMALIZER_TESTS_PLAN.exists() else ""
     item_removal_plan = ITEM_REMOVAL_PLAN.read_text(encoding="utf-8") if ITEM_REMOVAL_PLAN.exists() else ""
+    make_gates_plan = MAKE_GATES_PLAN.read_text(encoding="utf-8") if MAKE_GATES_PLAN.exists() else ""
 
     require(app_plist.get("CFBundleIdentifier", "").startswith("com.garethpaul."),
             "TravelList Info.plist must keep the expected sample bundle identifier",
@@ -237,11 +241,15 @@ def main():
     require(len(swift_files) >= 6,
             "expected Swift source/test inventory is missing",
             failures)
+    require(".PHONY: build check lint test" in makefile and "lint test build: check" in makefile,
+            "Makefile must expose lint, test, build, and check verification gates",
+            failures)
     require("*.local.xcconfig" in gitignore and ".env" in gitignore and "DerivedData" in gitignore,
             ".gitignore must exclude local config and Xcode build products",
             failures)
-    require("make check" in readme and "TravelList.xcodeproj" in readme and "local-first" in readme.lower(),
-            "README must document static verification, project usage, and local-first behavior",
+    require("make lint" in readme and "make test" in readme and "make build" in readme and
+            "make check" in readme and "TravelList.xcodeproj" in readme and "local-first" in readme.lower(),
+            "README must document static verification gates, project usage, and local-first behavior",
             failures)
     require("whitespace" in readme.lower() and "cell rendering" in readme.lower() and "index" in readme.lower() and
             "color fallback" in readme.lower() and "fallback cell" in readme.lower() and "stale cell" in readme.lower() and "name normalizer" in readme.lower(),
@@ -253,7 +261,8 @@ def main():
     require("removal index" in readme.lower(),
             "README must document travel item removal index guardrails",
             failures)
-    require("scripts/check-baseline.py" in vision and "local-first" in vision.lower() and
+    require("scripts/check-baseline.py" in vision and "make lint" in vision and "make test" in vision and
+            "make build" in vision and "local-first" in vision.lower() and
             "fallback cell" in vision.lower() and "stale cell" in vision.lower() and "name normalizer" in vision.lower(),
             "VISION must describe the current static travel-list baseline",
             failures)
@@ -271,6 +280,9 @@ def main():
             "fallback cell" in changes.lower() and "stale cell" in changes.lower() and
             "index" in changes.lower() and "name normalizer" in changes.lower() and "make check" in changes,
             "CHANGES must record item trimming, parser hardening, cell rendering/index cleanup, fallback cell reset, and baseline",
+            failures)
+    require("make lint" in changes and "make test" in changes and "make build" in changes,
+            "CHANGES must record the standard local gate aliases",
             failures)
     require("normalizer tests" in changes.lower(),
             "CHANGES must record travel item normalizer test updates",
@@ -290,6 +302,9 @@ def main():
             failures)
     require("status: completed" in item_removal_plan,
             "travel item removal index guard plan must be marked completed",
+            failures)
+    require("status: completed" in make_gates_plan,
+            "make gate aliases plan must be marked completed",
             failures)
 
     if shutil.which("xcodebuild"):

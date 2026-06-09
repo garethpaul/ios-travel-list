@@ -2,6 +2,8 @@
 
 ## 2026-06-09
 
+- Added local `make lint`, `make test`, and `make build` gate aliases for the
+  static Travel List baseline.
 - Added a removal index guard so invalid travel item selections do not mutate
   the local list.
 
