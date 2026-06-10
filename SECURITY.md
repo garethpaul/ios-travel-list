@@ -31,6 +31,8 @@ Helpful reports include:
 - Travel lists can reveal personal plans and routines. Keep item data local-first unless a future change documents storage, sync, consent, retention, and deletion behavior.
 - `make check` runs a static baseline that guards plist/storyboard metadata, Xcode project wiring, source inventory, the shared name normalizer, normalizer tests, cell index checks, removal index checks, navigation logo title view ownership, cell rendering, stale cell reset handling, and logging/network/persistence regressions when Xcode is unavailable.
 - Keep textfield outlet reads, storyboard casts, table indexes, and color parsing guarded so malformed local UI state does not crash the sample.
+- The pinned macOS workflow is read-only and parses project metadata without
+  reading travel-item data, running simulator interaction, or using signing material.
 
 ## Mobile Privacy Notes
 

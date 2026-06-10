@@ -75,6 +75,10 @@ make check
 
 Each Make gate runs `scripts/check-baseline.py`, parses plist/storyboard/asset metadata, checks image resources and Xcode wiring, verifies the shared name normalizer, guarded textfield outlet reads, normalizer tests, guarded storyboard casts, navigation logo title view ownership, configurable fallback cell rendering, stale cell reset handling, table index guards, removal index guards, invalid color fallback, and side-effect-free cell rendering, and guards against logging, network, upload, analytics, or persistence behavior. The `lint`, `test`, and `build` targets intentionally alias the static baseline so the standard local commands stay available while the legacy Xcode toolchain is unavailable.
 
+Pinned `macos-15` GitHub Actions runs `make check` and parses
+`TravelList.xcodeproj` with `xcodebuild -list`. This hosted validation does not
+inspect travel-item data, execute simulator interaction, or use signing material.
+
 For full legacy verification on macOS, use Xcode's test action or `xcodebuild test` with the appropriate scheme and destination.
 
 When the required SDK or runtime is unavailable, use static checks and source review first, then verify on a machine that has the matching platform toolchain.

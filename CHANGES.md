@@ -4,6 +4,8 @@
 
 - Guarded add-screen textfield outlet reads so missing storyboard wiring falls
   back through the shared name normalizer.
+- Added pinned, read-only macOS hosted project validation for `make check` and
+  `TravelList.xcodeproj` parsing.
 
 ## 2026-06-09
 
