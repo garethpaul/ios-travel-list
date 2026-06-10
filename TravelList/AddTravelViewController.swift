@@ -31,7 +31,7 @@ class AddTravelViewController: UIViewController {
         if sender as? NSObject != self.doneButton{
             return
         }
-        if let itemName = TravelListItem.normalizedName(self.textfield.text) {
+        if let itemName = TravelListItem.normalizedName(self.textfield?.text) {
             self.travelItem = TravelListItem(name: itemName)
         }
     }

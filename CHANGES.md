@@ -1,5 +1,10 @@
 # Changes
 
+## 2026-06-10
+
+- Guarded add-screen textfield outlet reads so missing storyboard wiring falls
+  back through the shared name normalizer.
+
 ## 2026-06-09
 
 - Added local `make lint`, `make test`, and `make build` gate aliases for the

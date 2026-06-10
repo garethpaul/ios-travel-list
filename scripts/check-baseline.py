@@ -18,6 +18,7 @@ ITEM_NORMALIZER_TESTS_PLAN = ROOT / "docs/plans/2026-06-09-travel-item-normalize
 ITEM_REMOVAL_PLAN = ROOT / "docs/plans/2026-06-09-travel-item-removal-index-guard.md"
 MAKE_GATES_PLAN = ROOT / "docs/plans/2026-06-09-make-gate-aliases.md"
 NAV_LOGO_PLAN = ROOT / "docs/plans/2026-06-09-navigation-logo-title-view.md"
+TEXTFIELD_GUARD_PLAN = ROOT / "docs/plans/2026-06-10-add-textfield-outlet-guard.md"
 PNG_SIGNATURE = b"\x89PNG\r\n\x1a\n"
 
 
@@ -103,6 +104,7 @@ def main():
         "docs/plans/2026-06-09-travel-item-removal-index-guard.md",
         "docs/plans/2026-06-09-make-gate-aliases.md",
         "docs/plans/2026-06-09-navigation-logo-title-view.md",
+        "docs/plans/2026-06-10-add-textfield-outlet-guard.md",
         "docs/readme-overview.svg",
     ]
 
@@ -151,6 +153,7 @@ def main():
     item_removal_plan = ITEM_REMOVAL_PLAN.read_text(encoding="utf-8") if ITEM_REMOVAL_PLAN.exists() else ""
     make_gates_plan = MAKE_GATES_PLAN.read_text(encoding="utf-8") if MAKE_GATES_PLAN.exists() else ""
     nav_logo_plan = NAV_LOGO_PLAN.read_text(encoding="utf-8") if NAV_LOGO_PLAN.exists() else ""
+    textfield_guard_plan = TEXTFIELD_GUARD_PLAN.read_text(encoding="utf-8") if TEXTFIELD_GUARD_PLAN.exists() else ""
 
     require(app_plist.get("CFBundleIdentifier", "").startswith("com.garethpaul."),
             "TravelList Info.plist must keep the expected sample bundle identifier",
@@ -170,7 +173,7 @@ def main():
     require("TravelListTableViewController" in storyboard and "AddTravelViewController" in storyboard and "unwindToList" in storyboard,
             "Storyboard must keep the list/add/unwind flow wired",
             failures)
-    require("TravelListItem.normalizedName(self.textfield.text)" in add_controller,
+    require("TravelListItem.normalizedName(self.textfield?.text)" in add_controller,
             "AddTravelViewController must normalize item names before accepting them",
             failures)
     for controller_name, controller_source in {
@@ -196,7 +199,7 @@ def main():
             "XCTAssert(true" not in tests and "testPerformanceExample" not in tests,
             "TravelListTests must replace template tests with travel item normalization and removal assertions",
             failures)
-    require("travelItem = nil" in add_controller and "TravelListItem.normalizedName(self.textfield.text)" in add_controller,
+    require("travelItem = nil" in add_controller and "TravelListItem.normalizedName(self.textfield?.text)" in add_controller,
             "AddTravelViewController must avoid force-unwrapping text and clear stale pending items",
             failures)
     require("!itemName.isEmpty" in item_model and "TravelListItem(name: itemName)" in add_controller,
@@ -265,7 +268,8 @@ def main():
             "README must document static verification gates, project usage, and local-first behavior",
             failures)
     require("whitespace" in readme.lower() and "cell rendering" in readme.lower() and "index" in readme.lower() and
-            "color fallback" in readme.lower() and "fallback cell" in readme.lower() and "stale cell" in readme.lower() and "name normalizer" in readme.lower() and "title view" in readme.lower(),
+            "color fallback" in readme.lower() and "fallback cell" in readme.lower() and "stale cell" in readme.lower() and
+            "textfield outlet" in readme.lower() and "name normalizer" in readme.lower() and "title view" in readme.lower(),
             "README must document item trimming, cell rendering, fallback cell reset, index, and parser guardrails",
             failures)
     require("normalizer tests" in readme.lower(),
@@ -276,7 +280,8 @@ def main():
             failures)
     require("scripts/check-baseline.py" in vision and "make lint" in vision and "make test" in vision and
             "make build" in vision and "local-first" in vision.lower() and
-            "fallback cell" in vision.lower() and "stale cell" in vision.lower() and "name normalizer" in vision.lower() and "title view" in vision.lower(),
+            "fallback cell" in vision.lower() and "stale cell" in vision.lower() and
+            "textfield outlet" in vision.lower() and "name normalizer" in vision.lower() and "title view" in vision.lower(),
             "VISION must describe the current static travel-list baseline",
             failures)
     require("normalizer tests" in vision.lower(),
@@ -286,12 +291,13 @@ def main():
             "VISION must describe travel item removal index guardrails",
             failures)
     require("travel lists" in security.lower() and "make check" in security and "stale cell" in security.lower() and
-            "name normalizer" in security.lower() and "normalizer tests" in security.lower() and "removal index" in security.lower() and "title view" in security.lower(),
+            "name normalizer" in security.lower() and "normalizer tests" in security.lower() and
+            "textfield outlet" in security.lower() and "removal index" in security.lower() and "title view" in security.lower(),
             "SECURITY must document travel-list privacy and the static baseline",
             failures)
     require("whitespace-only" in changes and "hex color" in changes and "cell rendering" in changes and
             "fallback cell" in changes.lower() and "stale cell" in changes.lower() and "title view" in changes.lower() and
-            "index" in changes.lower() and "name normalizer" in changes.lower() and "make check" in changes,
+            "index" in changes.lower() and "textfield outlet" in changes.lower() and "name normalizer" in changes.lower() and "make check" in changes,
             "CHANGES must record item trimming, parser hardening, cell rendering/index cleanup, fallback cell reset, and baseline",
             failures)
     require("make lint" in changes and "make test" in changes and "make build" in changes,
@@ -321,6 +327,9 @@ def main():
             failures)
     require("status: completed" in nav_logo_plan,
             "navigation logo title-view plan must be marked completed",
+            failures)
+    require("status: completed" in textfield_guard_plan,
+            "add textfield outlet guard plan must be marked completed",
             failures)
 
     if shutil.which("xcodebuild"):

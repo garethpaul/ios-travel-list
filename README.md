@@ -54,6 +54,7 @@ The checked-in project has no external dependency manifest. Use Xcode for full b
 - Open `TravelList.xcodeproj` in Xcode, choose the app or sample scheme, and run it on the matching simulator/device.
 - The sample is local-first and keeps list items in memory.
 - New item names go through a shared name normalizer before creation, and whitespace-only entries are ignored.
+- Add-screen textfield outlet reads fall back through the same normalizer when the outlet is unavailable.
 - Focused normalizer tests cover trimmed, blank, and missing travel item names.
 - Cell rendering uses a fallback cell that can still display an item if storyboard reuse wiring is unavailable.
 - Invalid or malformed rows clear stale cell text and accessory state before the fallback cell is returned.
@@ -72,7 +73,7 @@ make build
 make check
 ```
 
-Each Make gate runs `scripts/check-baseline.py`, parses plist/storyboard/asset metadata, checks image resources and Xcode wiring, verifies the shared name normalizer, normalizer tests, guarded storyboard casts, navigation logo title view ownership, configurable fallback cell rendering, stale cell reset handling, table index guards, removal index guards, invalid color fallback, and side-effect-free cell rendering, and guards against logging, network, upload, analytics, or persistence behavior. The `lint`, `test`, and `build` targets intentionally alias the static baseline so the standard local commands stay available while the legacy Xcode toolchain is unavailable.
+Each Make gate runs `scripts/check-baseline.py`, parses plist/storyboard/asset metadata, checks image resources and Xcode wiring, verifies the shared name normalizer, guarded textfield outlet reads, normalizer tests, guarded storyboard casts, navigation logo title view ownership, configurable fallback cell rendering, stale cell reset handling, table index guards, removal index guards, invalid color fallback, and side-effect-free cell rendering, and guards against logging, network, upload, analytics, or persistence behavior. The `lint`, `test`, and `build` targets intentionally alias the static baseline so the standard local commands stay available while the legacy Xcode toolchain is unavailable.
 
 For full legacy verification on macOS, use Xcode's test action or `xcodebuild test` with the appropriate scheme and destination.
 
@@ -101,6 +102,7 @@ When the required SDK or runtime is unavailable, use static checks and source re
 - See `docs/plans/2026-06-09-travel-item-normalizer-tests.md` for the normalizer tests guardrail.
 - See `docs/plans/2026-06-09-travel-item-removal-index-guard.md` for the removal index guardrail.
 - See `docs/plans/2026-06-09-navigation-logo-title-view.md` for the navigation logo title view guardrail.
+- See `docs/plans/2026-06-10-add-textfield-outlet-guard.md` for the textfield outlet guardrail.
 - See `docs/plans/2026-06-09-make-gate-aliases.md` for the local gate alias guardrail.
 - Run `make lint`, `make test`, `make build`, and `make check` before pushing changes to Swift sources, plist/storyboard files, image assets, Xcode metadata, list flow, or privacy documentation.
 

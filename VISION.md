@@ -20,6 +20,7 @@ Priority:
 - Keep screenshot and README aligned with app behavior
 - Avoid syncing or uploading travel-list data without explicit design
 - Keep normalizer tests focused on trimmed, blank, and missing travel item names
+- Keep add-screen textfield outlet reads guarded before item creation
 - Keep table rendering guarded against stale local indexes
 - Keep item removal index handling guarded before local list mutation
 - Keep fallback cell rendering configurable for valid rows
@@ -58,10 +59,11 @@ and avoid logging, syncing, or uploading item data without clear user action.
 Current baseline: `make lint`, `make test`, `make build`, and `make check` run
 `scripts/check-baseline.py` without Xcode. They verify plist/storyboard/asset
 metadata, local-first list flow, whitespace trimming through a shared name normalizer,
-normalizer tests, guarded storyboard/table flows, cell index checks, removal index
-checks, side-effect-free cell rendering, fallback cell handling, stale cell reset
-handling, navigation logo title view ownership, invalid color fallback, and no
-logging, network, upload, analytics, or persistence behavior.
+normalizer tests, guarded textfield outlet reads, guarded storyboard/table flows,
+cell index checks, removal index checks, side-effect-free cell rendering,
+fallback cell handling, stale cell reset handling, navigation logo title view
+ownership, invalid color fallback, and no logging, network, upload, analytics,
+or persistence behavior.
 
 ## What We Will Not Merge (For Now)
 
