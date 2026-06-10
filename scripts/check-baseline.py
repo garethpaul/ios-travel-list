@@ -21,6 +21,7 @@ MAKE_GATES_PLAN = ROOT / "docs/plans/2026-06-09-make-gate-aliases.md"
 NAV_LOGO_PLAN = ROOT / "docs/plans/2026-06-09-navigation-logo-title-view.md"
 TEXTFIELD_GUARD_PLAN = ROOT / "docs/plans/2026-06-10-add-textfield-outlet-guard.md"
 HOSTED_VALIDATION_PLAN = ROOT / "docs/plans/2026-06-10-hosted-project-validation.md"
+SWIFT_5_PLAN = ROOT / "docs/plans/2026-06-10-swift-5-typed-list-build.md"
 PNG_SIGNATURE = b"\x89PNG\r\n\x1a\n"
 
 
@@ -79,6 +80,7 @@ def main():
         ".github/workflows/check.yml",
         "CHANGES.md",
         "Makefile",
+        "build.sh",
         "README.md",
         "SECURITY.md",
         "VISION.md",
@@ -109,6 +111,7 @@ def main():
         "docs/plans/2026-06-09-navigation-logo-title-view.md",
         "docs/plans/2026-06-10-add-textfield-outlet-guard.md",
         "docs/plans/2026-06-10-hosted-project-validation.md",
+        "docs/plans/2026-06-10-swift-5-typed-list-build.md",
         "docs/readme-overview.svg",
     ]
 
@@ -148,6 +151,7 @@ def main():
     changes = read("CHANGES.md")
     gitignore = read(".gitignore")
     makefile = read("Makefile")
+    build_script = read("build.sh")
     baseline_plan = BASELINE_PLAN.read_text(encoding="utf-8") if BASELINE_PLAN.exists() else ""
     cell_index_plan = CELL_INDEX_PLAN.read_text(encoding="utf-8") if CELL_INDEX_PLAN.exists() else ""
     cell_fallback_plan = CELL_FALLBACK_PLAN.read_text(encoding="utf-8") if CELL_FALLBACK_PLAN.exists() else ""
@@ -159,6 +163,7 @@ def main():
     nav_logo_plan = NAV_LOGO_PLAN.read_text(encoding="utf-8") if NAV_LOGO_PLAN.exists() else ""
     textfield_guard_plan = TEXTFIELD_GUARD_PLAN.read_text(encoding="utf-8") if TEXTFIELD_GUARD_PLAN.exists() else ""
     hosted_validation_plan = HOSTED_VALIDATION_PLAN.read_text(encoding="utf-8") if HOSTED_VALIDATION_PLAN.exists() else ""
+    swift_5_plan = SWIFT_5_PLAN.read_text(encoding="utf-8") if SWIFT_5_PLAN.exists() else ""
     workflow = read(".github/workflows/check.yml")
 
     require(app_plist.get("CFBundleIdentifier", "").startswith("com.garethpaul."),
@@ -167,8 +172,10 @@ def main():
     require(test_plist.get("CFBundlePackageType") == "BNDL",
             "TravelListTests Info.plist must remain a test bundle plist",
             failures)
-    require("IPHONEOS_DEPLOYMENT_TARGET = 8.0;" in project and 'INFOPLIST_FILE = "$(SRCROOT)/TravelList/Info.plist";' in project,
-            "Xcode project must preserve legacy deployment and Info.plist wiring",
+    require(project.count("IPHONEOS_DEPLOYMENT_TARGET = 12.0;") == 2 and
+            project.count("SWIFT_VERSION = 5.0;") == 4 and
+            'INFOPLIST_FILE = "$(SRCROOT)/TravelList/Info.plist";' in project,
+            "Xcode project must use Swift 5 and iOS 12 while preserving Info.plist wiring",
             failures)
     require("ENABLE_TESTABILITY = YES;" in project and "@testable import TravelList" in tests,
             "Xcode project and tests must keep TravelList app code testable from XCTest",
@@ -179,21 +186,21 @@ def main():
     require("TravelListTableViewController" in storyboard and "AddTravelViewController" in storyboard and "unwindToList" in storyboard,
             "Storyboard must keep the list/add/unwind flow wired",
             failures)
-    require("TravelListItem.normalizedName(self.textfield?.text)" in add_controller,
+    require("TravelListItem.normalizedName(textfield.text)" in add_controller,
             "AddTravelViewController must normalize item names before accepting them",
             failures)
     for controller_name, controller_source in {
         "TravelListTableViewController": table_controller,
         "AddTravelViewController": add_controller,
     }.items():
-        require("self.navigationItem.titleView = logoView" in controller_source and
+        require("navigationItem.titleView = logoView" in controller_source and
                 "navigationController?.view.addSubview(logoView)" not in controller_source and
                 "bringSubviewToFront(logoView)" not in controller_source and
                 "logoView.frame.origin" not in controller_source,
                 f"{controller_name} must scope the travel logo to the navigation item title view",
                 failures)
-    require("class func normalizedName(name: String?) -> String?" in item_model and
-            "stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet())" in item_model and
+    require("class func normalizedName(_ name: String?) -> String?" in item_model and
+            "trimmingCharacters(in: .whitespacesAndNewlines)" in item_model and
             "itemName.isEmpty" in item_model and "return nil" in item_model,
             "TravelListItem must expose a shared optional name normalizer",
             failures)
@@ -205,38 +212,40 @@ def main():
             "XCTAssert(true" not in tests and "testPerformanceExample" not in tests,
             "TravelListTests must replace template tests with travel item normalization and removal assertions",
             failures)
-    require("travelItem = nil" in add_controller and "TravelListItem.normalizedName(self.textfield?.text)" in add_controller,
+    require("travelItem = nil" in add_controller and "let textfield = textfield" in add_controller and
+            "TravelListItem.normalizedName(textfield.text)" in add_controller,
             "AddTravelViewController must avoid force-unwrapping text and clear stale pending items",
             failures)
     require("!itemName.isEmpty" in item_model and "TravelListItem(name: itemName)" in add_controller,
             "AddTravelViewController must reject whitespace-only items",
             failures)
     hex_source = read("TravelList/Hex.swift")
-    require("let scanner = NSScanner(string: cString)" in hex_source and "scanner.atEnd" in hex_source,
-            "Hex parser must reject partial invalid scans",
+    require("UInt32(value, radix: 16)" in hex_source and "value.count == 6" in hex_source,
+            "Hex parser must reject malformed values",
             failures)
-    require("as? AddTravelViewController" in table_controller and "as? TravelListItem" in table_controller,
-            "TravelListTableViewController must guard storyboard and item casts",
+    require("as? AddTravelViewController" in table_controller and "var travelItems: [TravelListItem] = []" in table_controller and
+            "NSMutableArray" not in swift_sources,
+            "TravelListTableViewController must guard the storyboard cast and use typed item storage",
             failures)
-    require("?? UITableViewCell(style: .Default" in table_controller and "return UITableViewCell()" not in table_controller and
-            "indexPath.row >= self.travelItems.count" in table_controller,
+    require("?? UITableViewCell(style: .default" in table_controller and "return UITableViewCell()" not in table_controller and
+            "travelItems.indices.contains(indexPath.row)" in table_controller,
             "TravelListTableViewController must use a configurable fallback cell and guard invalid delete indexes",
             failures)
-    require("func removeTravelItemAtIndex(index: Int) -> Bool" in table_controller and
-            "index < 0 || index >= self.travelItems.count" in table_controller and
-            "self.travelItems.removeObjectAtIndex(index)" in table_controller and
-            "if self.removeTravelItemAtIndex(indexPath.row)" in table_controller,
+    require("func removeTravelItem(at index: Int) -> Bool" in table_controller and
+            "travelItems.indices.contains(index)" in table_controller and
+            "travelItems.remove(at: index)" in table_controller and
+            "if removeTravelItem(at: indexPath.row)" in table_controller,
             "TravelListTableViewController must remove items through a guarded index helper",
             failures)
-    require("func configureCell(cell: UITableViewCell, withTravelItem travelItem: TravelListItem?) -> UITableViewCell" in table_controller and
+    require("func configureCell(_ cell: UITableViewCell, with travelItem: TravelListItem?) -> UITableViewCell" in table_controller and
             'cell.textLabel?.text = ""' in table_controller and
-            "return configureCell(cell, withTravelItem: nil)" in table_controller and
-            "return configureCell(cell, withTravelItem: travelItem)" in table_controller,
+            "return configureCell(cell, with: nil)" in table_controller and
+            "return configureCell(cell, with: travelItems[indexPath.row])" in table_controller,
             "TravelListTableViewController must clear fallback cells before returning invalid or malformed rows",
             failures)
-    cell_method = table_controller.split("cellForRowAtIndexPath", 1)[1].split("didSelectRowAtIndexPath", 1)[0]
-    require("indexPath.row >= self.travelItems.count" in cell_method and
-            "return configureCell(cell, withTravelItem: nil)" in cell_method.split("indexPath.row >= self.travelItems.count", 1)[1],
+    cell_method = table_controller.split("cellForRowAt indexPath", 1)[1].split("didSelectRowAt indexPath", 1)[0]
+    require("travelItems.indices.contains(indexPath.row)" in cell_method and
+            "return configureCell(cell, with: nil)" in cell_method,
             "cellForRowAtIndexPath must guard invalid indexes before reading travelItems",
             failures)
     require("reloadData" not in cell_method,
@@ -245,7 +254,7 @@ def main():
     require("loadInitialData" in table_controller and "Phone" in table_controller and "Wallet" in table_controller and "Passport" in table_controller,
             "TravelListTableViewController must keep the sample seed items",
             failures)
-    require("class TravelListItem" in item_model and "creationDate" in item_model,
+    require("final class TravelListItem" in item_model and "creationDate" in item_model,
             "TravelListItem model must keep name/completion/date fields",
             failures)
     require(not re.search(r"\b(?:print|println|NSLog)\s*\(", swift_sources),
@@ -263,8 +272,16 @@ def main():
     require(len(swift_files) >= 6,
             "expected Swift source/test inventory is missing",
             failures)
-    require(".PHONY: build check lint test" in makefile and "lint test build: check" in makefile,
+    require(".PHONY: build check lint test" in makefile and "lint test build: check" in makefile and
+            "check:\n\tpython3 scripts/check-baseline.py\n\t./build.sh" in makefile,
             "Makefile must expose lint, test, build, and check verification gates",
+            failures)
+    shell_result = subprocess.run(["sh", "-n", "build.sh"], cwd=str(ROOT), text=True,
+                                  stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    require(shell_result.returncode == 0 and 'xcodebuild -project "TravelList.xcodeproj"' in build_script and
+            '-target "TravelList"' in build_script and "CODE_SIGNING_ALLOWED=NO" in build_script and
+            "xcodebuild unavailable" in build_script,
+            "build.sh must compile the unsigned TravelList simulator target and skip cleanly without Xcode",
             failures)
     require("*.local.xcconfig" in gitignore and ".env" in gitignore and "DerivedData" in gitignore,
             ".gitignore must exclude local config and Xcode build products",
@@ -339,6 +356,8 @@ def main():
             failures)
     require("status: completed" in hosted_validation_plan and "make check" in hosted_validation_plan,
             "hosted validation plan must be completed", failures)
+    require("status: completed" in swift_5_plan and "XCTest source remains non-executable" in swift_5_plan,
+            "Swift 5 typed-list plan must be completed and document the test-target boundary", failures)
     require("permissions:\n  contents: read" in workflow and "cancel-in-progress: true" in workflow and
             "runs-on: macos-15" in workflow and "timeout-minutes: 10" in workflow and
             "actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10" in workflow and "run: make check" in workflow,

@@ -2,6 +2,10 @@
 
 ## 2026-06-10
 
+- Migrated the app and checked-in test source to Swift 5 and iOS 12.
+- Replaced `NSMutableArray` list storage with typed `[TravelListItem]` storage.
+- Added an unsigned simulator app build to `make check` and hosted macOS CI;
+  the checked-in XCTest source remains unattached to a test target.
 - Guarded add-screen textfield outlet reads so missing storyboard wiring falls
   back through the shared name normalizer.
 - Added pinned, read-only macOS hosted project validation for `make check` and

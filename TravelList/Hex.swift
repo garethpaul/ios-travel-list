@@ -1,33 +1,20 @@
-//
-//  Hex.swift
-//
-
-import Foundation
 import UIKit
 
-// Concerts a hex string into a UIColor
-//
-func toColor (hex:String) -> UIColor {
-    var cString:String = hex.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet() as NSCharacterSet).uppercaseString
-    
-    if (cString.hasPrefix("#")) {
-        cString = cString.substringFromIndex(cString.startIndex.advancedBy(1))
+func toColor(_ hex: String) -> UIColor {
+    var value = hex.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
+    if value.hasPrefix("#") {
+        value.removeFirst()
     }
-    
-    if (cString.characters.count != 6) {
-        return UIColor.grayColor()
+
+    guard value.count == 6,
+          let rgbValue = UInt32(value, radix: 16) else {
+        return .gray
     }
-    
-    var rgbValue:UInt32 = 0
-    let scanner = NSScanner(string: cString)
-    if (!scanner.scanHexInt(&rgbValue) || !scanner.atEnd) {
-        return UIColor.grayColor()
-    }
-    
+
     return UIColor(
-        red: CGFloat((rgbValue & 0xFF0000) >> 16) / 255.0,
-        green: CGFloat((rgbValue & 0x00FF00) >> 8) / 255.0,
-        blue: CGFloat(rgbValue & 0x0000FF) / 255.0,
-        alpha: CGFloat(1.0)
+        red: CGFloat((rgbValue & 0xFF0000) >> 16) / 255,
+        green: CGFloat((rgbValue & 0x00FF00) >> 8) / 255,
+        blue: CGFloat(rgbValue & 0x0000FF) / 255,
+        alpha: 1
     )
 }
