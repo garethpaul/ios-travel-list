@@ -37,6 +37,14 @@ def read(relative_path):
     return (ROOT / relative_path).read_text(encoding="utf-8", errors="replace")
 
 
+def markdown_section(text, heading):
+    match = re.search(
+        rf"(?ms)^## {re.escape(heading)}\s*$\n(.*?)(?=^## |\Z)",
+        text,
+    )
+    return match.group(1).strip() if match else ""
+
+
 def strip_swift_line_comments(text):
     return "\n".join(line.split("//", 1)[0] for line in text.splitlines())
 
@@ -377,8 +385,40 @@ def main():
             "hosted validation plan must be completed", failures)
     require("status: completed" in swift_5_plan and "XCTest source" in swift_5_plan,
             "Swift 5 typed-list plan must be completed and document the original test-target boundary", failures)
-    require("status: completed" in xctest_target_plan and "mutation" in xctest_target_plan.lower(),
-            "XCTest target build plan must record completed mutation verification", failures)
+    xctest_target_status = re.findall(r"(?mi)^status:\s*(.+?)\s*$", xctest_target_plan)
+    xctest_target_work = markdown_section(xctest_target_plan, "Work Completed")
+    xctest_target_verification = markdown_section(
+        xctest_target_plan, "Verification Completed"
+    )
+    require(xctest_target_status == ["completed"] and xctest_target_work,
+            "XCTest target build plan must record one completed status and completed work",
+            failures)
+    require(xctest_target_verification and
+            not re.search(r"(?i)\b(?:pending|todo|tbd|not run)\b", xctest_target_verification),
+            "XCTest target build plan must record finished verification without pending markers",
+            failures)
+    for evidence in [
+        "make check",
+        "make lint",
+        "make test",
+        "make build",
+        "python3 -m py_compile scripts/check-baseline.py",
+        "sh -n build.sh",
+        "git diff --check",
+        "27395471515",
+        "27395475871",
+        "27395516880",
+        "27402323830",
+        "6e6727a004a980f958bf039baf33c306720378df",
+        "ce8e091b3182eb82840a33e85940d0d5657685f8",
+        "com.apple.product-type.bundle.unit-test",
+        "TravelListTests.swift in Sources",
+        "TravelList target dependency",
+        '-target "TravelListTests"',
+    ]:
+        require(evidence in xctest_target_verification,
+                f"XCTest target build plan must preserve verification evidence: {evidence}",
+                failures)
     checkout_step = re.search(
         r"(?m)^      - name: Check out repository\n"
         r"        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6\.0\.3\n"
