@@ -4,16 +4,19 @@ status: completed
 
 ## Context
 
-The sample has an SDK-free `make check` baseline for list behavior, metadata,
-image assets, docs, and local-first privacy guardrails. Full app verification
-still requires macOS and Xcode. The missing guard was hosted CI for the static
-baseline.
+The sample began with an SDK-free `make check` baseline for list behavior,
+metadata, image assets, docs, and local-first privacy guardrails. Hosted CI now
+runs that baseline on macOS and compiles the unsigned app when Xcode is present.
 
 ## Changes
 
-- Added `.github/workflows/check.yml` for GitHub Actions.
-- Ran the Python static baseline on Ubuntu with Python 3.12.
-- Kept full simulator/device verification documented as a macOS toolchain task.
+- Added `.github/workflows/check.yml` for GitHub Actions, then advanced it to a
+  pinned, read-only, bounded `macos-15` job.
+- Disabled persisted checkout credentials.
+- Run the Python static baseline and unsigned simulator build through the same
+  `make check` entry point.
+- Keep simulator interaction, signed installation, and device verification as
+  separate macOS developer tasks.
 - Extended the checker and docs so hosted CI stays visible.
 
 ## Verification

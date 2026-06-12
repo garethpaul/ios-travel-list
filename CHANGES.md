@@ -2,10 +2,15 @@
 
 ## 2026-06-10
 
-- Added a GitHub Actions workflow that runs the SDK-free `make check` baseline
-  for the local-first travel list sample.
+- Migrated the app and checked-in test source to Swift 5 and iOS 12.
+- Replaced `NSMutableArray` list storage with typed `[TravelListItem]` storage.
+- Added an unsigned simulator app build to `make check` and hosted macOS CI;
+  the checked-in XCTest source remains unattached to a test target.
 - Guarded add-screen textfield outlet reads so missing storyboard wiring falls
   back through the shared name normalizer.
+- Added pinned, read-only macOS GitHub Actions project validation for
+  `make check` and `TravelList.xcodeproj` parsing without persisted checkout
+  credentials.
 
 ## 2026-06-09
 

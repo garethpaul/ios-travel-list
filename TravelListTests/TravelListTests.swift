@@ -6,10 +6,10 @@
 import XCTest
 @testable import TravelList
 
-class MyAppTests: XCTestCase {
+final class MyAppTests: XCTestCase {
 
     func testTravelItemNameNormalizationTrimsWhitespace() {
-        XCTAssertEqual(TravelListItem.normalizedName("  Passport\n")!, "Passport", "Travel item names should be trimmed before saving")
+        XCTAssertEqual(TravelListItem.normalizedName("  Passport\n"), "Passport", "Travel item names should be trimmed before saving")
     }
 
     func testTravelItemNameNormalizationRejectsBlankNames() {
@@ -19,18 +19,18 @@ class MyAppTests: XCTestCase {
 
     func testRemoveTravelItemAtIndexRemovesValidItem() {
         let controller = TravelListTableViewController()
-        controller.travelItems.addObject(TravelListItem(name: "Passport"))
+        controller.travelItems.append(TravelListItem(name: "Passport"))
 
-        XCTAssertTrue(controller.removeTravelItemAtIndex(0), "Valid travel item indexes should be removable")
+        XCTAssertTrue(controller.removeTravelItem(at: 0), "Valid travel item indexes should be removable")
         XCTAssertEqual(controller.travelItems.count, 0, "Removing a valid item should update the local list")
     }
 
     func testRemoveTravelItemAtIndexRejectsInvalidIndexes() {
         let controller = TravelListTableViewController()
-        controller.travelItems.addObject(TravelListItem(name: "Passport"))
+        controller.travelItems.append(TravelListItem(name: "Passport"))
 
-        XCTAssertFalse(controller.removeTravelItemAtIndex(-1), "Negative travel item indexes should not be removed")
-        XCTAssertFalse(controller.removeTravelItemAtIndex(1), "Out-of-range travel item indexes should not be removed")
+        XCTAssertFalse(controller.removeTravelItem(at: -1), "Negative travel item indexes should not be removed")
+        XCTAssertFalse(controller.removeTravelItem(at: 1), "Out-of-range travel item indexes should not be removed")
         XCTAssertEqual(controller.travelItems.count, 1, "Invalid item removal should leave the local list unchanged")
     }
 

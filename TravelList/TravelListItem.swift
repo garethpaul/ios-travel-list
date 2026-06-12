@@ -1,24 +1,21 @@
-//
-//  ToDoItem.swift
-
 import Foundation
 
-class TravelListItem: NSObject{
+final class TravelListItem: NSObject {
+    var itemName: String
+    var completed = false
+    let creationDate = Date()
 
-    var itemName: NSString = ""
-    var completed: Bool = false
-    var creationDate: NSDate = NSDate()
-    
-    init(name:String){
-        self.itemName = name
+    init(name: String) {
+        itemName = name
+        super.init()
     }
 
-    class func normalizedName(name: String?) -> String? {
-        if let itemName = name?.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet()) where !itemName.isEmpty {
-            return itemName
+    class func normalizedName(_ name: String?) -> String? {
+        guard let itemName = name?.trimmingCharacters(in: .whitespacesAndNewlines),
+              !itemName.isEmpty else {
+            return nil
         }
 
-        return nil
+        return itemName
     }
-
 }

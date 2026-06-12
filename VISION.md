@@ -26,17 +26,20 @@ Priority:
 - Keep fallback cell rendering configurable for valid rows
 - Clear stale cell state when invalid or malformed rows use fallback cells
 - Keep the travel logo scoped to each navigation item title view
+- Keep travel-item storage strongly typed in Swift
 - Maintain a small Xcode project structure
 - Keep `make lint`, `make test`, `make build`, and `make check` available as
   local verification gates
-- Keep GitHub Actions aligned with the SDK-free `make check` baseline
+- Keep GitHub Actions project validation pinned and read-only on macOS through an
+  unsigned app build in `make check`
+- Keep checkout credential-free so build steps cannot reuse the workflow token
 - Keep `scripts/check-baseline.py` passing for local-first list behavior,
   item trimming, storyboard wiring, Xcode metadata, and source inventory
 
 Next priorities:
 
 - Strengthen tests around adding, displaying, and clearing travel items
-- Modernize Swift/project settings in a dedicated pass
+- Add an XCTest target for the checked-in normalization and removal tests
 - Clarify persistence behavior and data ownership
 
 Contribution rules:
@@ -58,7 +61,7 @@ Travel lists can reveal personal plans. The app should remain local by default
 and avoid logging, syncing, or uploading item data without clear user action.
 
 Current baseline: `make lint`, `make test`, `make build`, and `make check` run
-`scripts/check-baseline.py` without Xcode. They verify plist/storyboard/asset
+`scripts/check-baseline.py` and compile the app when Xcode is available. They verify plist/storyboard/asset
 metadata, local-first list flow, whitespace trimming through a shared name normalizer,
 normalizer tests, guarded textfield outlet reads, guarded storyboard/table flows,
 cell index checks, removal index checks, side-effect-free cell rendering,

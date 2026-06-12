@@ -1,113 +1,84 @@
-//
-//  TableViewController.swift
-//
-
 import UIKit
 
 class TravelListTableViewController: UITableViewController {
+    var travelItems: [TravelListItem] = []
 
-    @IBAction func unwindToList(segue:UIStoryboardSegue){
-        guard let source = segue.sourceViewController as? AddTravelViewController else {
+    @IBAction func unwindToList(_ segue: UIStoryboardSegue) {
+        guard let source = segue.source as? AddTravelViewController,
+              let item = source.travelItem else {
             return
         }
-        if let item: TravelListItem = source.travelItem{
-            self.travelItems.addObject(item)
-            self.tableView.reloadData()
-        }
-        
+
+        travelItems.append(item)
+        tableView.reloadData()
     }
-    
-    var travelItems: NSMutableArray = []
-    var logoView: UIImageView!
-    
-    override func viewDidLoad(){
+
+    override func viewDidLoad() {
         super.viewDidLoad()
-        self.tableView.tableFooterView = UIView(frame: CGRectZero)
-        self.tableView.contentInset = UIEdgeInsets(top: 0, left: -10, bottom: 0, right: 0)
-        
-        logoView = UIImageView(frame: CGRectMake(0, 0, 40, 40))
-        logoView.image = UIImage(named: "logoTravel")?.imageWithRenderingMode(.AlwaysTemplate)
+        tableView.tableFooterView = UIView(frame: .zero)
+        tableView.contentInset = UIEdgeInsets(top: 0, left: -10, bottom: 0, right: 0)
+
+        let logoView = UIImageView(frame: CGRect(x: 0, y: 0, width: 40, height: 40))
+        logoView.image = UIImage(named: "logoTravel")?.withRenderingMode(.alwaysTemplate)
         logoView.tintColor = toColor("#F9F9F9")
-        self.navigationItem.titleView = logoView
-        
+        navigationItem.titleView = logoView
+
         loadInitialData()
     }
-    
-    func loadInitialData(){
-        let item1 = TravelListItem(name:"Phone")
-        self.travelItems.addObject(item1)
-        let item2 = TravelListItem(name: "Wallet")
-        self.travelItems.addObject(item2)
-        let item3 = TravelListItem(name: "Passport")
-        self.travelItems.addObject(item3)
-    }
-    
-    override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
-        return 1
-    }
-    
-    override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return self.travelItems.count
-    }
-    
 
-    override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let CellIndentifier: NSString = "ListPrototypeCell"
-        
-        let cell = tableView.dequeueReusableCellWithIdentifier(CellIndentifier as String) ?? UITableViewCell(style: .Default, reuseIdentifier: CellIndentifier as String)
+    func loadInitialData() {
+        travelItems.append(TravelListItem(name: "Phone"))
+        travelItems.append(TravelListItem(name: "Wallet"))
+        travelItems.append(TravelListItem(name: "Passport"))
+    }
 
-        if indexPath.row >= self.travelItems.count {
-            return configureCell(cell, withTravelItem: nil)
-        }
-        
-        guard let travelItem = self.travelItems.objectAtIndex(indexPath.row) as? TravelListItem else {
-            return configureCell(cell, withTravelItem: nil)
+    override func numberOfSections(in tableView: UITableView) -> Int {
+        1
+    }
+
+    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        travelItems.count
+    }
+
+    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let reuseIdentifier = "ListPrototypeCell"
+        let cell = tableView.dequeueReusableCell(withIdentifier: reuseIdentifier)
+            ?? UITableViewCell(style: .default, reuseIdentifier: reuseIdentifier)
+
+        guard travelItems.indices.contains(indexPath.row) else {
+            return configureCell(cell, with: nil)
         }
 
-        return configureCell(cell, withTravelItem: travelItem)
+        return configureCell(cell, with: travelItems[indexPath.row])
     }
 
-    func configureCell(cell: UITableViewCell, withTravelItem travelItem: TravelListItem?) -> UITableViewCell {
+    func configureCell(_ cell: UITableViewCell, with travelItem: TravelListItem?) -> UITableViewCell {
         guard let travelItem = travelItem else {
             cell.textLabel?.text = ""
-            cell.textLabel?.textColor = UIColor.whiteColor()
-            cell.accessoryType = .None
+            cell.textLabel?.textColor = .white
+            cell.accessoryType = .none
             return cell
         }
 
-        cell.textLabel?.text = travelItem.itemName as String
-        cell.textLabel?.textColor = UIColor.whiteColor()
-
-        
-        if travelItem.completed{
-            cell.accessoryType = .Checkmark
-        }
-            
-        else{
-            
-            cell.accessoryType = .None
-            
-        }
-        
+        cell.textLabel?.text = travelItem.itemName
+        cell.textLabel?.textColor = .white
+        cell.accessoryType = travelItem.completed ? .checkmark : .none
         return cell
     }
 
-    func removeTravelItemAtIndex(index: Int) -> Bool {
-        if index < 0 || index >= self.travelItems.count {
+    func removeTravelItem(at index: Int) -> Bool {
+        guard travelItems.indices.contains(index) else {
             return false
         }
 
-        self.travelItems.removeObjectAtIndex(index)
+        travelItems.remove(at: index)
         return true
     }
-    
-    override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        tableView.deselectRowAtIndexPath(indexPath, animated: false)
-        if self.removeTravelItemAtIndex(indexPath.row) {
+
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: false)
+        if removeTravelItem(at: indexPath.row) {
             tableView.reloadData()
         }
-        
     }
 }
-
-

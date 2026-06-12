@@ -52,6 +52,8 @@ The checked-in project has no external dependency manifest. Use Xcode for full b
 ## Running or Using the Project
 
 - Open `TravelList.xcodeproj` in Xcode, choose the app or sample scheme, and run it on the matching simulator/device.
+- Run `./build.sh` to compile the unsigned Swift 5 app for the simulator when
+  Xcode is installed.
 - The sample is local-first and keeps list items in memory.
 - New item names go through a shared name normalizer before creation, and whitespace-only entries are ignored.
 - Add-screen textfield outlet reads fall back through the same normalizer when the outlet is unavailable.
@@ -73,13 +75,15 @@ make build
 make check
 ```
 
-Each Make gate runs `scripts/check-baseline.py`, parses plist/storyboard/asset metadata, checks image resources and Xcode wiring, verifies the shared name normalizer, guarded textfield outlet reads, normalizer tests, guarded storyboard casts, navigation logo title view ownership, configurable fallback cell rendering, stale cell reset handling, table index guards, removal index guards, invalid color fallback, and side-effect-free cell rendering, and guards against logging, network, upload, analytics, or persistence behavior. The `lint`, `test`, and `build` targets intentionally alias the static baseline so the standard local commands stay available while the legacy Xcode toolchain is unavailable.
+Each Make gate runs `scripts/check-baseline.py`, parses plist/storyboard/asset metadata, checks image resources and Xcode wiring, verifies typed travel-item storage, the shared name normalizer, guarded textfield outlet reads, normalizer tests, navigation logo title view ownership, fallback cell reset, table/removal index guards, invalid color fallback, and side-effect-free cell rendering, and guards against logging, network, upload, analytics, or persistence behavior. When Xcode is available the same gate compiles the unsigned app target; otherwise the build step skips cleanly.
 
-For full legacy verification on macOS, use Xcode's test action or `xcodebuild test` with the appropriate scheme and destination.
+Pinned `macos-15` GitHub Actions runs `make check` and compiles the unsigned
+Swift 5 app target. This hosted validation does not inspect travel-item data,
+execute simulator interaction, or use signing material.
 
-GitHub Actions runs the same Python static `make check` baseline on Ubuntu for
-pushes and pull requests. Full simulator and device verification remains a
-macOS Xcode task.
+The checked-in XCTest source is not attached to an XCTest target, so `make test`
+currently validates its assertions statically rather than executing them. A
+future project-structure change should add the missing test target.
 
 When the required SDK or runtime is unavailable, use static checks and source review first, then verify on a machine that has the matching platform toolchain.
 
@@ -110,6 +114,10 @@ When the required SDK or runtime is unavailable, use static checks and source re
 - See `docs/plans/2026-06-09-make-gate-aliases.md` for the local gate alias guardrail.
 - See `docs/plans/2026-06-10-ci-baseline.md` for the GitHub Actions static
   baseline.
+- See `docs/plans/2026-06-10-hosted-project-validation.md` for pinned macOS
+  project parsing and unsigned build validation.
+- See `docs/plans/2026-06-10-swift-5-typed-list-build.md` for the Swift 5 typed
+  list migration and current XCTest target limitation.
 - Run `make lint`, `make test`, `make build`, and `make check` before pushing changes to Swift sources, plist/storyboard files, image assets, Xcode metadata, list flow, or privacy documentation.
 
 ## Contributing
