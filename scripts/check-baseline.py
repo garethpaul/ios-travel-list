@@ -78,7 +78,6 @@ def check_png(relative_path, failures):
 def main():
     failures = []
     required_files = [
-        ".github/workflows/check.yml",
         ".gitignore",
         ".github/workflows/check.yml",
         "CHANGES.md",
@@ -374,13 +373,16 @@ def main():
         r"          persist-credentials: false\n",
         workflow,
     )
+    actions = re.findall(r"(?m)^\s*(?:-\s*)?uses:\s*(\S+)(?:\s+#.*)?$", workflow)
     require(checkout_step is not None and
-            workflow.count("actions/checkout@") == 1 and
+            actions == ["actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10"] and
             workflow.count("persist-credentials:") == 1 and
+            workflow.count("permissions:") == 1 and
+            re.search(r"(?m)^\s+[A-Za-z-]+:\s+write\s*$", workflow) is None and
             "permissions:\n  contents: read" in workflow and "cancel-in-progress: true" in workflow and
             "runs-on: macos-15" in workflow and "timeout-minutes: 10" in workflow and
             "actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10" in workflow and "run: make check" in workflow,
-            "Check workflow contract must stay singular, pinned, credential-free, read-only, and bounded", failures)
+            "Check workflow contract must use only pinned checkout with singular, credential-free, read-only, bounded configuration", failures)
 
     if shutil.which("xcodebuild"):
         result = subprocess.run(["xcodebuild", "-list", "-project", "TravelList.xcodeproj"], cwd=ROOT,

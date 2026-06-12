@@ -23,8 +23,8 @@
 
 ## Coding conventions
 
-- Language mix noted in the README: Swift (6), C/C++ headers (1).
-- Preserve legacy Xcode project settings and signing assumptions unless the change is explicitly about modernization.
+- Language mix noted in the README: Swift 5, Python 3, and a legacy C header.
+- Preserve the iOS 12 deployment target and unsigned simulator build assumptions unless the change is explicitly about modernization.
 
 ## Testing guidance
 
