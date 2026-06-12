@@ -31,6 +31,9 @@ Helpful reports include:
 - Travel lists can reveal personal plans and routines. Keep item data local-first unless a future change documents storage, sync, consent, retention, and deletion behavior.
 - `make check` runs a static baseline that guards plist/storyboard metadata, Xcode project wiring, source inventory, the shared name normalizer, normalizer tests, cell index checks, removal index checks, navigation logo title view ownership, cell rendering, stale cell reset handling, and logging/network/persistence regressions when Xcode is unavailable.
 - Keep textfield outlet reads, storyboard casts, table indexes, and color parsing guarded so malformed local UI state does not crash the sample.
+- GitHub Actions runs only the SDK-free `make check` baseline. Do not add list
+  uploads, sync, deployment, or credentialed service steps to that workflow
+  without a separate privacy and security review.
 
 ## Mobile Privacy Notes
 

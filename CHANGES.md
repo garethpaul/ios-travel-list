@@ -2,6 +2,8 @@
 
 ## 2026-06-10
 
+- Added a GitHub Actions workflow that runs the SDK-free `make check` baseline
+  for the local-first travel list sample.
 - Guarded add-screen textfield outlet reads so missing storyboard wiring falls
   back through the shared name normalizer.
 

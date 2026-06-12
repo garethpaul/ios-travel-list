@@ -29,6 +29,7 @@ Priority:
 - Maintain a small Xcode project structure
 - Keep `make lint`, `make test`, `make build`, and `make check` available as
   local verification gates
+- Keep GitHub Actions aligned with the SDK-free `make check` baseline
 - Keep `scripts/check-baseline.py` passing for local-first list behavior,
   item trimming, storyboard wiring, Xcode metadata, and source inventory
 

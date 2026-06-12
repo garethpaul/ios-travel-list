@@ -19,6 +19,8 @@ ITEM_REMOVAL_PLAN = ROOT / "docs/plans/2026-06-09-travel-item-removal-index-guar
 MAKE_GATES_PLAN = ROOT / "docs/plans/2026-06-09-make-gate-aliases.md"
 NAV_LOGO_PLAN = ROOT / "docs/plans/2026-06-09-navigation-logo-title-view.md"
 TEXTFIELD_GUARD_PLAN = ROOT / "docs/plans/2026-06-10-add-textfield-outlet-guard.md"
+CI_WORKFLOW = ROOT / ".github/workflows/check.yml"
+CI_PLAN = ROOT / "docs/plans/2026-06-10-ci-baseline.md"
 PNG_SIGNATURE = b"\x89PNG\r\n\x1a\n"
 
 
@@ -73,6 +75,7 @@ def check_png(relative_path, failures):
 def main():
     failures = []
     required_files = [
+        ".github/workflows/check.yml",
         ".gitignore",
         "CHANGES.md",
         "Makefile",
@@ -105,6 +108,7 @@ def main():
         "docs/plans/2026-06-09-make-gate-aliases.md",
         "docs/plans/2026-06-09-navigation-logo-title-view.md",
         "docs/plans/2026-06-10-add-textfield-outlet-guard.md",
+        "docs/plans/2026-06-10-ci-baseline.md",
         "docs/readme-overview.svg",
     ]
 
@@ -154,6 +158,8 @@ def main():
     make_gates_plan = MAKE_GATES_PLAN.read_text(encoding="utf-8") if MAKE_GATES_PLAN.exists() else ""
     nav_logo_plan = NAV_LOGO_PLAN.read_text(encoding="utf-8") if NAV_LOGO_PLAN.exists() else ""
     textfield_guard_plan = TEXTFIELD_GUARD_PLAN.read_text(encoding="utf-8") if TEXTFIELD_GUARD_PLAN.exists() else ""
+    ci_workflow = CI_WORKFLOW.read_text(encoding="utf-8") if CI_WORKFLOW.exists() else ""
+    ci_plan = CI_PLAN.read_text(encoding="utf-8") if CI_PLAN.exists() else ""
 
     require(app_plist.get("CFBundleIdentifier", "").startswith("com.garethpaul."),
             "TravelList Info.plist must keep the expected sample bundle identifier",
@@ -260,11 +266,14 @@ def main():
     require(".PHONY: build check lint test" in makefile and "lint test build: check" in makefile,
             "Makefile must expose lint, test, build, and check verification gates",
             failures)
+    require("actions/setup-python@v5" in ci_workflow and 'python-version: "3.12"' in ci_workflow and "make check" in ci_workflow,
+            "GitHub Actions workflow must run the Python static make check baseline",
+            failures)
     require("*.local.xcconfig" in gitignore and ".env" in gitignore and "DerivedData" in gitignore,
             ".gitignore must exclude local config and Xcode build products",
             failures)
     require("make lint" in readme and "make test" in readme and "make build" in readme and
-            "make check" in readme and "TravelList.xcodeproj" in readme and "local-first" in readme.lower(),
+            "make check" in readme and "GitHub Actions" in readme and "TravelList.xcodeproj" in readme and "local-first" in readme.lower(),
             "README must document static verification gates, project usage, and local-first behavior",
             failures)
     require("whitespace" in readme.lower() and "cell rendering" in readme.lower() and "index" in readme.lower() and
@@ -279,7 +288,7 @@ def main():
             "README must document travel item removal index guardrails",
             failures)
     require("scripts/check-baseline.py" in vision and "make lint" in vision and "make test" in vision and
-            "make build" in vision and "local-first" in vision.lower() and
+            "make build" in vision and "GitHub Actions" in vision and "local-first" in vision.lower() and
             "fallback cell" in vision.lower() and "stale cell" in vision.lower() and
             "textfield outlet" in vision.lower() and "name normalizer" in vision.lower() and "title view" in vision.lower(),
             "VISION must describe the current static travel-list baseline",
@@ -290,12 +299,12 @@ def main():
     require("removal index" in vision.lower(),
             "VISION must describe travel item removal index guardrails",
             failures)
-    require("travel lists" in security.lower() and "make check" in security and "stale cell" in security.lower() and
+    require("travel lists" in security.lower() and "make check" in security and "GitHub Actions" in security and "stale cell" in security.lower() and
             "name normalizer" in security.lower() and "normalizer tests" in security.lower() and
             "textfield outlet" in security.lower() and "removal index" in security.lower() and "title view" in security.lower(),
             "SECURITY must document travel-list privacy and the static baseline",
             failures)
-    require("whitespace-only" in changes and "hex color" in changes and "cell rendering" in changes and
+    require("GitHub Actions" in changes and "whitespace-only" in changes and "hex color" in changes and "cell rendering" in changes and
             "fallback cell" in changes.lower() and "stale cell" in changes.lower() and "title view" in changes.lower() and
             "index" in changes.lower() and "textfield outlet" in changes.lower() and "name normalizer" in changes.lower() and "make check" in changes,
             "CHANGES must record item trimming, parser hardening, cell rendering/index cleanup, fallback cell reset, and baseline",
@@ -330,6 +339,9 @@ def main():
             failures)
     require("status: completed" in textfield_guard_plan,
             "add textfield outlet guard plan must be marked completed",
+            failures)
+    require("status: completed" in ci_plan and "GitHub Actions" in ci_plan and "make check" in ci_plan,
+            "CI baseline plan must record hosted make check verification",
             failures)
 
     if shutil.which("xcodebuild"):
