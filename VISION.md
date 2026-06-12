@@ -61,7 +61,7 @@ Travel lists can reveal personal plans. The app should remain local by default
 and avoid logging, syncing, or uploading item data without clear user action.
 
 Current baseline: `make lint`, `make test`, `make build`, and `make check` run
-`scripts/check-baseline.py` and compile the app when Xcode is available. They verify plist/storyboard/asset
+`scripts/check-baseline.py` and compile the app and XCTest target when Xcode is available. They verify plist/storyboard/asset
 metadata, local-first list flow, whitespace trimming through a shared name normalizer,
 normalizer tests, guarded textfield outlet reads, guarded storyboard/table flows,
 cell index checks, removal index checks, side-effect-free cell rendering,

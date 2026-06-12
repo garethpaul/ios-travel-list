@@ -14,7 +14,18 @@
 		79C5974C19418A280085192D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 79C5974A19418A280085192D /* Main.storyboard */; };
 		79C5974E19418A280085192D /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 79C5974D19418A280085192D /* Images.xcassets */; };
 		7F0D5A751B17E6940021A4DB /* Hex.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F0D5A741B17E6940021A4DB /* Hex.swift */; };
+		A10000000000000000000001 /* TravelListTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79C5975919418A280085192D /* TravelListTests.swift */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		A10000000000000000000002 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 79C5973919418A280085192D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 79C5974019418A280085192D;
+			remoteInfo = TravelList;
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		7928D5A51941ACBF00654B60 /* TravelListTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TravelListTableViewController.swift; sourceTree = "<group>"; };
@@ -28,10 +39,18 @@
 		79C5975819418A280085192D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		79C5975919418A280085192D /* TravelListTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TravelListTests.swift; sourceTree = "<group>"; };
 		7F0D5A741B17E6940021A4DB /* Hex.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Hex.swift; sourceTree = "<group>"; };
+		A10000000000000000000003 /* TravelListTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TravelListTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		79C5973E19418A280085192D /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A10000000000000000000004 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -54,6 +73,7 @@
 			isa = PBXGroup;
 			children = (
 				79C5974119418A280085192D /* TravelList.app */,
+				A10000000000000000000003 /* TravelListTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -118,6 +138,24 @@
 			productReference = 79C5974119418A280085192D /* TravelList.app */;
 			productType = "com.apple.product-type.application";
 		};
+		A10000000000000000000005 /* TravelListTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A1000000000000000000000B /* Build configuration list for PBXNativeTarget "TravelListTests" */;
+			buildPhases = (
+				A10000000000000000000006 /* Sources */,
+				A10000000000000000000004 /* Frameworks */,
+				A10000000000000000000007 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				A10000000000000000000008 /* PBXTargetDependency */,
+			);
+			name = TravelListTests;
+			productName = TravelListTests;
+			productReference = A10000000000000000000003 /* TravelListTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -129,6 +167,10 @@
 				TargetAttributes = {
 					79C5974019418A280085192D = {
 						CreatedOnToolsVersion = 6.0;
+					};
+					A10000000000000000000005 = {
+						CreatedOnToolsVersion = 6.0;
+						TestTargetID = 79C5974019418A280085192D;
 					};
 				};
 			};
@@ -146,6 +188,7 @@
 			projectRoot = "";
 			targets = (
 				79C5974019418A280085192D /* TravelList */,
+				A10000000000000000000005 /* TravelListTests */,
 			);
 		};
 /* End PBXProject section */
@@ -157,6 +200,13 @@
 			files = (
 				79C5974C19418A280085192D /* Main.storyboard in Resources */,
 				79C5974E19418A280085192D /* Images.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A10000000000000000000007 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -175,7 +225,23 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		A10000000000000000000006 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A10000000000000000000001 /* TravelListTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		A10000000000000000000008 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 79C5974019418A280085192D /* TravelList */;
+			targetProxy = A10000000000000000000002 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
 		79C5974A19418A280085192D /* Main.storyboard */ = {
@@ -297,6 +363,32 @@
 			};
 			name = Release;
 		};
+		A10000000000000000000009 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				INFOPLIST_FILE = "$(SRCROOT)/TravelListTests/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/TravelList.app/TravelList";
+			};
+			name = Debug;
+		};
+		A1000000000000000000000A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				INFOPLIST_FILE = "$(SRCROOT)/TravelListTests/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/TravelList.app/TravelList";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -314,6 +406,15 @@
 			buildConfigurations = (
 				79C5975E19418A280085192D /* Debug */,
 				79C5975F19418A280085192D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A1000000000000000000000B /* Build configuration list for PBXNativeTarget "TravelListTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A10000000000000000000009 /* Debug */,
+				A1000000000000000000000A /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
