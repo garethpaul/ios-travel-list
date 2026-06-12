@@ -1,6 +1,6 @@
 # XCTest Target Build
 
-status: planned
+status: completed
 
 ## Context
 
@@ -9,7 +9,7 @@ but `TravelList.xcodeproj` has no `TravelListTests` native target. Hosted CI
 therefore compiles only the app and cannot detect compiler regressions in the
 normalization and guarded-removal tests.
 
-## Scope
+## Completed Scope
 
 - Add a `TravelListTests` unit-test bundle target using the checked-in test
   source and plist.
@@ -30,3 +30,6 @@ normalization and guarded-removal tests.
 - `python3 -m py_compile scripts/check-baseline.py`
 - hosted unsigned app and XCTest target compilation
 - `git diff --check`
+- Mutation results: removing the unit-test product type, test source membership,
+  app target dependency, or `build.sh` test-target invocation was rejected by
+  `scripts/check-baseline.py`.

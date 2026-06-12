@@ -46,6 +46,7 @@
 - Cell rendering should remain side-effect free and validate row indexes before reading list data; avoid reloading the table from inside `cellForRowAtIndexPath`.
 - Keep fallback cell handling configurable so valid rows can still display item text if storyboard reuse wiring changes.
 - Clear stale cell text and accessory state before returning fallback cells for invalid or malformed rows.
+- Keep `TravelListTests.swift` attached to the app-hosted XCTest target and compiler-checked by `make check`.
 - Keep storyboard casts, text-field reads, table indexes, and color parsing guarded so malformed local UI state falls back safely.
 
 ## Agent workflow

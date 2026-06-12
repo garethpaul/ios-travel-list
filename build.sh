@@ -8,7 +8,7 @@ if ! command -v xcodebuild >/dev/null 2>&1; then
 fi
 
 xcodebuild -project "TravelList.xcodeproj" \
-           -target "TravelList" \
+           -target "TravelListTests" \
            -sdk iphonesimulator \
            -configuration "Debug" \
            CODE_SIGNING_ALLOWED=NO \

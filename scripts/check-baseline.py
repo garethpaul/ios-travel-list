@@ -24,6 +24,7 @@ CI_WORKFLOW = ROOT / ".github/workflows/check.yml"
 CI_PLAN = ROOT / "docs/plans/2026-06-10-ci-baseline.md"
 HOSTED_VALIDATION_PLAN = ROOT / "docs/plans/2026-06-10-hosted-project-validation.md"
 SWIFT_5_PLAN = ROOT / "docs/plans/2026-06-10-swift-5-typed-list-build.md"
+XCTEST_TARGET_PLAN = ROOT / "docs/plans/2026-06-12-xctest-target-build.md"
 PNG_SIGNATURE = b"\x89PNG\r\n\x1a\n"
 
 
@@ -115,6 +116,7 @@ def main():
         "docs/plans/2026-06-10-ci-baseline.md",
         "docs/plans/2026-06-10-hosted-project-validation.md",
         "docs/plans/2026-06-10-swift-5-typed-list-build.md",
+        "docs/plans/2026-06-12-xctest-target-build.md",
         "docs/readme-overview.svg",
     ]
 
@@ -169,6 +171,7 @@ def main():
     ci_plan = CI_PLAN.read_text(encoding="utf-8") if CI_PLAN.exists() else ""
     hosted_validation_plan = HOSTED_VALIDATION_PLAN.read_text(encoding="utf-8") if HOSTED_VALIDATION_PLAN.exists() else ""
     swift_5_plan = SWIFT_5_PLAN.read_text(encoding="utf-8") if SWIFT_5_PLAN.exists() else ""
+    xctest_target_plan = XCTEST_TARGET_PLAN.read_text(encoding="utf-8") if XCTEST_TARGET_PLAN.exists() else ""
     workflow = read(".github/workflows/check.yml")
 
     require(app_plist.get("CFBundleIdentifier", "").startswith("com.garethpaul."),
@@ -178,9 +181,17 @@ def main():
             "TravelListTests Info.plist must remain a test bundle plist",
             failures)
     require(project.count("IPHONEOS_DEPLOYMENT_TARGET = 12.0;") == 2 and
-            project.count("SWIFT_VERSION = 5.0;") == 4 and
+            project.count("SWIFT_VERSION = 5.0;") == 6 and
             'INFOPLIST_FILE = "$(SRCROOT)/TravelList/Info.plist";' in project,
             "Xcode project must use Swift 5 and iOS 12 while preserving Info.plist wiring",
+            failures)
+    require('name = TravelListTests;' in project and
+            'productType = "com.apple.product-type.bundle.unit-test";' in project and
+            project.count('TravelListTests.swift in Sources') == 2 and
+            'target = 79C5974019418A280085192D /* TravelList */;' in project and
+            'INFOPLIST_FILE = "$(SRCROOT)/TravelListTests/Info.plist";' in project and
+            'TEST_HOST = "$(BUILT_PRODUCTS_DIR)/TravelList.app/TravelList";' in project,
+            "Xcode project must attach TravelListTests.swift to an app-hosted XCTest target",
             failures)
     require("ENABLE_TESTABILITY = YES;" in project and "@testable import TravelList" in tests,
             "Xcode project and tests must keep TravelList app code testable from XCTest",
@@ -284,9 +295,9 @@ def main():
     shell_result = subprocess.run(["sh", "-n", "build.sh"], cwd=str(ROOT), text=True,
                                   stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     require(shell_result.returncode == 0 and 'xcodebuild -project "TravelList.xcodeproj"' in build_script and
-            '-target "TravelList"' in build_script and "CODE_SIGNING_ALLOWED=NO" in build_script and
+            '-target "TravelListTests"' in build_script and "CODE_SIGNING_ALLOWED=NO" in build_script and
             "xcodebuild unavailable" in build_script,
-            "build.sh must compile the unsigned TravelList simulator target and skip cleanly without Xcode",
+            "build.sh must compile the unsigned TravelList app and XCTest target and skip cleanly without Xcode",
             failures)
     require("*.local.xcconfig" in gitignore and ".env" in gitignore and "DerivedData" in gitignore,
             ".gitignore must exclude local config and Xcode build products",
@@ -364,8 +375,10 @@ def main():
             failures)
     require("status: completed" in hosted_validation_plan and "make check" in hosted_validation_plan,
             "hosted validation plan must be completed", failures)
-    require("status: completed" in swift_5_plan and "XCTest source remains non-executable" in swift_5_plan,
-            "Swift 5 typed-list plan must be completed and document the test-target boundary", failures)
+    require("status: completed" in swift_5_plan and "XCTest source" in swift_5_plan,
+            "Swift 5 typed-list plan must be completed and document the original test-target boundary", failures)
+    require("status: completed" in xctest_target_plan and "mutation" in xctest_target_plan.lower(),
+            "XCTest target build plan must record completed mutation verification", failures)
     checkout_step = re.search(
         r"(?m)^      - name: Check out repository\n"
         r"        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6\.0\.3\n"
