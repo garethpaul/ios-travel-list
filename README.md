@@ -112,6 +112,12 @@ When the required SDK or runtime is unavailable, use static checks and source re
 - See `docs/plans/2026-06-09-navigation-logo-title-view.md` for the navigation logo title view guardrail.
 - See `docs/plans/2026-06-10-add-textfield-outlet-guard.md` for the textfield outlet guardrail.
 - See `docs/plans/2026-06-09-make-gate-aliases.md` for the local gate alias guardrail.
+- See `docs/plans/2026-06-10-ci-baseline.md` for the GitHub Actions static
+  baseline.
+- See `docs/plans/2026-06-10-hosted-project-validation.md` for pinned macOS
+  project parsing and unsigned build validation.
+- See `docs/plans/2026-06-10-swift-5-typed-list-build.md` for the Swift 5 typed
+  list migration and current XCTest target limitation.
 - Run `make lint`, `make test`, `make build`, and `make check` before pushing changes to Swift sources, plist/storyboard files, image assets, Xcode metadata, list flow, or privacy documentation.
 
 ## Contributing

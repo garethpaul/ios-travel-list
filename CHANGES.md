@@ -8,8 +8,9 @@
   the checked-in XCTest source remains unattached to a test target.
 - Guarded add-screen textfield outlet reads so missing storyboard wiring falls
   back through the shared name normalizer.
-- Added pinned, read-only macOS hosted project validation for `make check` and
-  `TravelList.xcodeproj` parsing.
+- Added pinned, read-only macOS GitHub Actions project validation for
+  `make check` and `TravelList.xcodeproj` parsing without persisted checkout
+  credentials.
 
 ## 2026-06-09
 

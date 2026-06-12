@@ -20,6 +20,8 @@ ITEM_REMOVAL_PLAN = ROOT / "docs/plans/2026-06-09-travel-item-removal-index-guar
 MAKE_GATES_PLAN = ROOT / "docs/plans/2026-06-09-make-gate-aliases.md"
 NAV_LOGO_PLAN = ROOT / "docs/plans/2026-06-09-navigation-logo-title-view.md"
 TEXTFIELD_GUARD_PLAN = ROOT / "docs/plans/2026-06-10-add-textfield-outlet-guard.md"
+CI_WORKFLOW = ROOT / ".github/workflows/check.yml"
+CI_PLAN = ROOT / "docs/plans/2026-06-10-ci-baseline.md"
 HOSTED_VALIDATION_PLAN = ROOT / "docs/plans/2026-06-10-hosted-project-validation.md"
 SWIFT_5_PLAN = ROOT / "docs/plans/2026-06-10-swift-5-typed-list-build.md"
 PNG_SIGNATURE = b"\x89PNG\r\n\x1a\n"
@@ -110,6 +112,7 @@ def main():
         "docs/plans/2026-06-09-make-gate-aliases.md",
         "docs/plans/2026-06-09-navigation-logo-title-view.md",
         "docs/plans/2026-06-10-add-textfield-outlet-guard.md",
+        "docs/plans/2026-06-10-ci-baseline.md",
         "docs/plans/2026-06-10-hosted-project-validation.md",
         "docs/plans/2026-06-10-swift-5-typed-list-build.md",
         "docs/readme-overview.svg",
@@ -162,6 +165,8 @@ def main():
     make_gates_plan = MAKE_GATES_PLAN.read_text(encoding="utf-8") if MAKE_GATES_PLAN.exists() else ""
     nav_logo_plan = NAV_LOGO_PLAN.read_text(encoding="utf-8") if NAV_LOGO_PLAN.exists() else ""
     textfield_guard_plan = TEXTFIELD_GUARD_PLAN.read_text(encoding="utf-8") if TEXTFIELD_GUARD_PLAN.exists() else ""
+    ci_workflow = CI_WORKFLOW.read_text(encoding="utf-8") if CI_WORKFLOW.exists() else ""
+    ci_plan = CI_PLAN.read_text(encoding="utf-8") if CI_PLAN.exists() else ""
     hosted_validation_plan = HOSTED_VALIDATION_PLAN.read_text(encoding="utf-8") if HOSTED_VALIDATION_PLAN.exists() else ""
     swift_5_plan = SWIFT_5_PLAN.read_text(encoding="utf-8") if SWIFT_5_PLAN.exists() else ""
     workflow = read(".github/workflows/check.yml")
@@ -287,7 +292,7 @@ def main():
             ".gitignore must exclude local config and Xcode build products",
             failures)
     require("make lint" in readme and "make test" in readme and "make build" in readme and
-            "make check" in readme and "TravelList.xcodeproj" in readme and "local-first" in readme.lower(),
+            "make check" in readme and "GitHub Actions" in readme and "TravelList.xcodeproj" in readme and "local-first" in readme.lower(),
             "README must document static verification gates, project usage, and local-first behavior",
             failures)
     require("whitespace" in readme.lower() and "cell rendering" in readme.lower() and "index" in readme.lower() and
@@ -302,7 +307,7 @@ def main():
             "README must document travel item removal index guardrails",
             failures)
     require("scripts/check-baseline.py" in vision and "make lint" in vision and "make test" in vision and
-            "make build" in vision and "local-first" in vision.lower() and
+            "make build" in vision and "GitHub Actions" in vision and "local-first" in vision.lower() and
             "fallback cell" in vision.lower() and "stale cell" in vision.lower() and
             "textfield outlet" in vision.lower() and "name normalizer" in vision.lower() and "title view" in vision.lower(),
             "VISION must describe the current static travel-list baseline",
@@ -313,12 +318,12 @@ def main():
     require("removal index" in vision.lower(),
             "VISION must describe travel item removal index guardrails",
             failures)
-    require("travel lists" in security.lower() and "make check" in security and "stale cell" in security.lower() and
+    require("travel lists" in security.lower() and "make check" in security and "GitHub Actions" in security and "stale cell" in security.lower() and
             "name normalizer" in security.lower() and "normalizer tests" in security.lower() and
             "textfield outlet" in security.lower() and "removal index" in security.lower() and "title view" in security.lower(),
             "SECURITY must document travel-list privacy and the static baseline",
             failures)
-    require("whitespace-only" in changes and "hex color" in changes and "cell rendering" in changes and
+    require("GitHub Actions" in changes and "whitespace-only" in changes and "hex color" in changes and "cell rendering" in changes and
             "fallback cell" in changes.lower() and "stale cell" in changes.lower() and "title view" in changes.lower() and
             "index" in changes.lower() and "textfield outlet" in changes.lower() and "name normalizer" in changes.lower() and "make check" in changes,
             "CHANGES must record item trimming, parser hardening, cell rendering/index cleanup, fallback cell reset, and baseline",
@@ -354,14 +359,30 @@ def main():
     require("status: completed" in textfield_guard_plan,
             "add textfield outlet guard plan must be marked completed",
             failures)
+    require("status: completed" in ci_plan and "GitHub Actions" in ci_plan and "make check" in ci_plan,
+            "CI baseline plan must record hosted make check verification",
+            failures)
     require("status: completed" in hosted_validation_plan and "make check" in hosted_validation_plan,
             "hosted validation plan must be completed", failures)
     require("status: completed" in swift_5_plan and "XCTest source remains non-executable" in swift_5_plan,
             "Swift 5 typed-list plan must be completed and document the test-target boundary", failures)
-    require("permissions:\n  contents: read" in workflow and "cancel-in-progress: true" in workflow and
+    checkout_step = re.search(
+        r"(?m)^      - name: Check out repository\n"
+        r"        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6\.0\.3\n"
+        r"        with:\n"
+        r"          persist-credentials: false\n",
+        workflow,
+    )
+    actions = re.findall(r"(?m)^\s*(?:-\s*)?uses:\s*(\S+)(?:\s+#.*)?$", workflow)
+    require(checkout_step is not None and
+            actions == ["actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10"] and
+            workflow.count("persist-credentials:") == 1 and
+            workflow.count("permissions:") == 1 and
+            re.search(r"(?m)^\s+[A-Za-z-]+:\s+write\s*$", workflow) is None and
+            "permissions:\n  contents: read" in workflow and "cancel-in-progress: true" in workflow and
             "runs-on: macos-15" in workflow and "timeout-minutes: 10" in workflow and
             "actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10" in workflow and "run: make check" in workflow,
-            "Check workflow contract must stay pinned, read-only, and bounded", failures)
+            "Check workflow contract must use only pinned checkout with singular, credential-free, read-only, bounded configuration", failures)
 
     if shutil.which("xcodebuild"):
         result = subprocess.run(["xcodebuild", "-list", "-project", "TravelList.xcodeproj"], cwd=ROOT,

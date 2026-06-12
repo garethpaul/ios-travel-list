@@ -30,8 +30,9 @@ Priority:
 - Maintain a small Xcode project structure
 - Keep `make lint`, `make test`, `make build`, and `make check` available as
   local verification gates
-- Keep hosted project validation pinned and read-only on macOS through an
+- Keep GitHub Actions project validation pinned and read-only on macOS through an
   unsigned app build in `make check`
+- Keep checkout credential-free so build steps cannot reuse the workflow token
 - Keep `scripts/check-baseline.py` passing for local-first list behavior,
   item trimming, storyboard wiring, Xcode metadata, and source inventory
 
