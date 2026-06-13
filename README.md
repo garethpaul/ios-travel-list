@@ -61,6 +61,8 @@ The checked-in project has no external dependency manifest. Use Xcode for full b
 - Cell rendering uses a fallback cell that can still display an item if storyboard reuse wiring is unavailable.
 - Invalid or malformed rows clear stale cell text and accessory state before the fallback cell is returned.
 - Item removal index checks reject stale or invalid row selections before mutating the local list.
+- Duplicate item checks reject case-insensitive name matches before appending or
+  reloading the table.
 - The travel logo is scoped to each navigation item title view instead of being
   added as a navigation-controller overlay.
 
@@ -108,6 +110,8 @@ When the required SDK or runtime is unavailable, use static checks and source re
 - See `docs/plans/2026-06-09-travel-item-name-normalizer.md` for the shared name normalizer guardrail.
 - See `docs/plans/2026-06-09-travel-item-normalizer-tests.md` for the normalizer tests guardrail.
 - See `docs/plans/2026-06-09-travel-item-removal-index-guard.md` for the removal index guardrail.
+- See `docs/plans/2026-06-13-duplicate-travel-item-guard.md` for the duplicate
+  item guardrail.
 - See `docs/plans/2026-06-09-navigation-logo-title-view.md` for the navigation logo title view guardrail.
 - See `docs/plans/2026-06-10-add-textfield-outlet-guard.md` for the textfield outlet guardrail.
 - See `docs/plans/2026-06-09-make-gate-aliases.md` for the local gate alias guardrail.

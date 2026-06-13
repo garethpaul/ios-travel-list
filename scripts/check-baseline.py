@@ -25,6 +25,7 @@ CI_PLAN = ROOT / "docs/plans/2026-06-10-ci-baseline.md"
 HOSTED_VALIDATION_PLAN = ROOT / "docs/plans/2026-06-10-hosted-project-validation.md"
 SWIFT_5_PLAN = ROOT / "docs/plans/2026-06-10-swift-5-typed-list-build.md"
 XCTEST_TARGET_PLAN = ROOT / "docs/plans/2026-06-12-xctest-target-build.md"
+DUPLICATE_ITEM_PLAN = ROOT / "docs/plans/2026-06-13-duplicate-travel-item-guard.md"
 PNG_SIGNATURE = b"\x89PNG\r\n\x1a\n"
 
 
@@ -125,6 +126,7 @@ def main():
         "docs/plans/2026-06-10-hosted-project-validation.md",
         "docs/plans/2026-06-10-swift-5-typed-list-build.md",
         "docs/plans/2026-06-12-xctest-target-build.md",
+        "docs/plans/2026-06-13-duplicate-travel-item-guard.md",
         "docs/readme-overview.svg",
     ]
 
@@ -180,6 +182,7 @@ def main():
     hosted_validation_plan = HOSTED_VALIDATION_PLAN.read_text(encoding="utf-8") if HOSTED_VALIDATION_PLAN.exists() else ""
     swift_5_plan = SWIFT_5_PLAN.read_text(encoding="utf-8") if SWIFT_5_PLAN.exists() else ""
     xctest_target_plan = XCTEST_TARGET_PLAN.read_text(encoding="utf-8") if XCTEST_TARGET_PLAN.exists() else ""
+    duplicate_item_plan = DUPLICATE_ITEM_PLAN.read_text(encoding="utf-8") if DUPLICATE_ITEM_PLAN.exists() else ""
     workflow = read(".github/workflows/check.yml")
 
     require(app_plist.get("CFBundleIdentifier", "").startswith("com.garethpaul."),
@@ -232,9 +235,26 @@ def main():
             "testTravelItemNameNormalizationRejectsBlankNames" in tests and
             "testRemoveTravelItemAtIndexRemovesValidItem" in tests and
             "testRemoveTravelItemAtIndexRejectsInvalidIndexes" in tests and
+            "testAddTravelItemAppendsUniqueItem" in tests and
+            "testAddTravelItemRejectsCaseInsensitiveDuplicates" in tests and
             "XCTAssertEqual" in tests and "XCTAssertNil" in tests and
             "XCTAssert(true" not in tests and "testPerformanceExample" not in tests,
             "TravelListTests must replace template tests with travel item normalization and removal assertions",
+            failures)
+    add_item_index = table_controller.find("func addTravelItem(_ item: TravelListItem) -> Bool")
+    next_table_method_index = table_controller.find("override func tableView", add_item_index)
+    add_item_body = table_controller[add_item_index:next_table_method_index]
+    unwind_start = table_controller.find("@IBAction func unwindToList")
+    unwind_end = table_controller.find("override func viewDidLoad", unwind_start)
+    unwind_body = table_controller[unwind_start:unwind_end]
+    require(add_item_index != -1 and next_table_method_index != -1 and
+            "travelItems.contains(where:" in add_item_body and
+            ".caseInsensitiveCompare(item.itemName) == .orderedSame" in add_item_body and
+            "return false" in add_item_body and
+            add_item_body.find("return false") < add_item_body.find("travelItems.append(item)") < add_item_body.find("return true") and
+            "if addTravelItem(item)" in unwind_body and
+            unwind_body.find("if addTravelItem(item)") < unwind_body.find("tableView.reloadData()"),
+            "TravelListTableViewController must reject case-insensitive duplicates before append and reload only on success",
             failures)
     require("travelItem = nil" in add_controller and "let textfield = textfield" in add_controller and
             "TravelListItem.normalizedName(textfield.text)" in add_controller,
@@ -325,6 +345,8 @@ def main():
     require("removal index" in readme.lower(),
             "README must document travel item removal index guardrails",
             failures)
+    require("duplicate item checks" in readme.lower(),
+            "README must document duplicate item guardrails", failures)
     require("scripts/check-baseline.py" in vision and "make lint" in vision and "make test" in vision and
             "make build" in vision and "GitHub Actions" in vision and "local-first" in vision.lower() and
             "fallback cell" in vision.lower() and "stale cell" in vision.lower() and
@@ -337,11 +359,15 @@ def main():
     require("removal index" in vision.lower(),
             "VISION must describe travel item removal index guardrails",
             failures)
+    require("duplicate item checks" in vision.lower(),
+            "VISION must describe duplicate item guardrails", failures)
     require("travel lists" in security.lower() and "make check" in security and "GitHub Actions" in security and "stale cell" in security.lower() and
             "name normalizer" in security.lower() and "normalizer tests" in security.lower() and
             "textfield outlet" in security.lower() and "removal index" in security.lower() and "title view" in security.lower(),
             "SECURITY must document travel-list privacy and the static baseline",
             failures)
+    require("duplicate item checks" in security.lower(),
+            "SECURITY must document duplicate item guardrails", failures)
     require("GitHub Actions" in changes and "whitespace-only" in changes and "hex color" in changes and "cell rendering" in changes and
             "fallback cell" in changes.lower() and "stale cell" in changes.lower() and "title view" in changes.lower() and
             "index" in changes.lower() and "textfield outlet" in changes.lower() and "name normalizer" in changes.lower() and "make check" in changes,
@@ -356,6 +382,8 @@ def main():
     require("removal index" in changes.lower(),
             "CHANGES must record travel item removal index updates",
             failures)
+    require("duplicate item checks" in changes.lower(),
+            "CHANGES must record duplicate item updates", failures)
     require("status: completed" in baseline_plan and "status: completed" in cell_index_plan and
             "status: completed" in cell_fallback_plan and "status: completed" in cell_reset_plan,
             "plans must be marked completed",
@@ -385,6 +413,10 @@ def main():
             "hosted validation plan must be completed", failures)
     require("status: completed" in swift_5_plan and "XCTest source" in swift_5_plan,
             "Swift 5 typed-list plan must be completed and document the original test-target boundary", failures)
+    require("status: completed" in duplicate_item_plan and
+            "All four Make gates" in duplicate_item_plan and
+            "hostile mutations" in duplicate_item_plan.lower(),
+            "duplicate travel item plan must record completed status and verification", failures)
     xctest_target_status = re.findall(r"(?mi)^status:\s*(.+?)\s*$", xctest_target_plan)
     xctest_target_work = markdown_section(xctest_target_plan, "Work Completed")
     xctest_target_verification = markdown_section(

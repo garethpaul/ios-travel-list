@@ -34,4 +34,20 @@ final class MyAppTests: XCTestCase {
         XCTAssertEqual(controller.travelItems.count, 1, "Invalid item removal should leave the local list unchanged")
     }
 
+    func testAddTravelItemAppendsUniqueItem() {
+        let controller = TravelListTableViewController()
+
+        XCTAssertTrue(controller.addTravelItem(TravelListItem(name: "Passport")))
+        XCTAssertEqual(controller.travelItems.count, 1)
+    }
+
+    func testAddTravelItemRejectsCaseInsensitiveDuplicates() {
+        let controller = TravelListTableViewController()
+        controller.travelItems.append(TravelListItem(name: "Passport"))
+
+        XCTAssertFalse(controller.addTravelItem(TravelListItem(name: "Passport")))
+        XCTAssertFalse(controller.addTravelItem(TravelListItem(name: "passport")))
+        XCTAssertEqual(controller.travelItems.count, 1)
+    }
+
 }

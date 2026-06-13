@@ -1,5 +1,10 @@
 # Changes
 
+## 2026-06-13
+
+- Added case-insensitive duplicate item checks before user-added list mutation
+  and table reload.
+
 ## 2026-06-12
 
 - Added an app-hosted `TravelListTests` target and made `make check` compile the
