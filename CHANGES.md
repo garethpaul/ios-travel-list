@@ -2,6 +2,8 @@
 
 ## 2026-06-13
 
+- Made all Make verification aliases location-independent when invoked through
+  an absolute Makefile path.
 - Added case-insensitive duplicate item checks before user-added list mutation
   and table reload.
 

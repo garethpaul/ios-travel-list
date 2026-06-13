@@ -122,6 +122,8 @@ When the required SDK or runtime is unavailable, use static checks and source re
 - See `docs/plans/2026-06-10-swift-5-typed-list-build.md` for the Swift 5 typed
   list migration and current XCTest target limitation.
 - Run `make lint`, `make test`, `make build`, and `make check` before pushing changes to Swift sources, plist/storyboard files, image assets, Xcode metadata, list flow, or privacy documentation.
+- The same gates may be invoked through an absolute Makefile path from another
+  directory; verification resolves both commands relative to the checkout.
 
 ## Contributing
 
