@@ -9,8 +9,9 @@ class TravelListTableViewController: UITableViewController {
             return
         }
 
-        travelItems.append(item)
-        tableView.reloadData()
+        if addTravelItem(item) {
+            tableView.reloadData()
+        }
     }
 
     override func viewDidLoad() {
@@ -72,6 +73,17 @@ class TravelListTableViewController: UITableViewController {
         }
 
         travelItems.remove(at: index)
+        return true
+    }
+
+    func addTravelItem(_ item: TravelListItem) -> Bool {
+        guard !travelItems.contains(where: {
+            $0.itemName.caseInsensitiveCompare(item.itemName) == .orderedSame
+        }) else {
+            return false
+        }
+
+        travelItems.append(item)
         return true
     }
 

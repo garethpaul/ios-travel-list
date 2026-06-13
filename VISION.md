@@ -23,6 +23,7 @@ Priority:
 - Keep add-screen textfield outlet reads guarded before item creation
 - Keep table rendering guarded against stale local indexes
 - Keep item removal index handling guarded before local list mutation
+- Keep duplicate item checks case-insensitive and ahead of list mutation
 - Keep fallback cell rendering configurable for valid rows
 - Clear stale cell state when invalid or malformed rows use fallback cells
 - Keep the travel logo scoped to each navigation item title view

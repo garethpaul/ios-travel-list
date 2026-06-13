@@ -1,6 +1,6 @@
 # Duplicate Travel Item Guard
 
-status: planned
+status: completed
 
 ## Context
 
@@ -53,17 +53,22 @@ single Done action sequence.
   normalized display names and case-insensitive comparison.
 - Do not claim interactive simulator validation without Xcode.
 
-## Verification
+## Work Completed
 
-- `make lint`
-- `make test`
-- `make build`
-- `make check`
-- `python3 -m py_compile scripts/check-baseline.py`
-- Parse plist, storyboard, workspace, project, workflow, JSON, SVG, and PNG
-  metadata with available local parsers.
-- `sh -n build.sh`
-- `git diff --check`
-- Hostile mutations removing duplicate detection, weakening case-insensitive
-  comparison, appending before the guard, reloading on rejection, removing
-  focused tests, or falsifying plan evidence must be rejected.
+- Added a Boolean append helper that rejects case-insensitive name matches
+  before mutating the typed local list.
+- Routed the unwind action through the helper and reloads only after success.
+- Added focused XCTest assertions and static/documentation contracts.
+
+## Verification Completed
+
+- All four Make gates, `make lint`, `make test`, `make build`, and `make check`,
+  passed against the complete static baseline.
+- `python3 -m py_compile scripts/check-baseline.py`, plist parsing, storyboard,
+  workspace, and SVG XML parsing, asset/workflow JSON and YAML parsing, PNG
+  validation, `sh -n build.sh`, and `git diff --check` passed.
+- Seven hostile mutations removing duplicate detection, weakening comparison,
+  appending before the guard, reloading on rejection, or removing focused tests
+  or falsifying plan status or verification evidence were rejected.
+- The local environment did not provide `xcodebuild`, so XCTest execution and
+  interactive storyboard validation were not claimed.
