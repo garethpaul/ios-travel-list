@@ -55,7 +55,7 @@ The checked-in project has no external dependency manifest. Use Xcode for full b
 - Run `./build.sh` to compile the unsigned Swift 5 app for the simulator when
   Xcode is installed.
 - The sample is local-first and keeps list items in memory.
-- New item names go through a shared name normalizer before creation, and whitespace-only entries are ignored.
+- New item names go through a shared name normalizer at both UI creation and the collection add boundary, and whitespace-only entries are ignored.
 - Add-screen textfield outlet reads fall back through the same normalizer when the outlet is unavailable.
 - Focused normalizer tests cover trimmed, blank, and missing travel item names.
 - Cell rendering uses a fallback cell that can still display an item if storyboard reuse wiring is unavailable.
@@ -112,6 +112,8 @@ When the required SDK or runtime is unavailable, use static checks and source re
 - See `docs/plans/2026-06-09-travel-item-removal-index-guard.md` for the removal index guardrail.
 - See `docs/plans/2026-06-13-duplicate-travel-item-guard.md` for the duplicate
   item guardrail.
+- See `docs/plans/2026-06-14-canonical-travel-item-add-boundary.md` for direct
+  caller normalization at the collection mutation boundary.
 - See `docs/plans/2026-06-09-navigation-logo-title-view.md` for the navigation logo title view guardrail.
 - See `docs/plans/2026-06-10-add-textfield-outlet-guard.md` for the textfield outlet guardrail.
 - See `docs/plans/2026-06-09-make-gate-aliases.md` for the local gate alias guardrail.

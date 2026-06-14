@@ -77,12 +77,17 @@ class TravelListTableViewController: UITableViewController {
     }
 
     func addTravelItem(_ item: TravelListItem) -> Bool {
+        guard let normalizedName = TravelListItem.normalizedName(item.itemName) else {
+            return false
+        }
+
         guard !travelItems.contains(where: {
-            $0.itemName.caseInsensitiveCompare(item.itemName) == .orderedSame
+            $0.itemName.caseInsensitiveCompare(normalizedName) == .orderedSame
         }) else {
             return false
         }
 
+        item.itemName = normalizedName
         travelItems.append(item)
         return true
     }

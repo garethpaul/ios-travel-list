@@ -1,6 +1,6 @@
 # Canonical Travel Item Add Boundary
 
-status: planned
+status: completed
 
 ## Context
 
@@ -42,3 +42,28 @@ caller can therefore add blank names or whitespace-padded duplicates such as
   plan status, and missing verification evidence.
 - Audit the exact diff, generated artifacts, and intended files for secret
   patterns before committing.
+
+## Work Completed
+
+- Normalized names inside `addTravelItem` before duplicate comparison and list
+  mutation.
+- Rejected blank direct callers and stored the canonical display name on every
+  successful append.
+- Added focused XCTest and static contracts for padded unique, duplicate, and
+  blank direct-call inputs.
+- Updated contributor, security, vision, and changelog guidance.
+
+## Verification Completed
+
+- All four Make gates passed from the checkout and reported that `xcodebuild` was unavailable,
+  so this Linux host exercised the complete static baseline.
+- The full gate passed from an external directory through the absolute Makefile path.
+- `python3 -m py_compile scripts/check-baseline.py`, `sh -n build.sh`, plist,
+  storyboard, workspace, project, asset, and workflow parsing, and
+  `git diff --check` passed.
+- Six isolated hostile mutations were rejected: missing add-boundary
+  normalization, raw-name duplicate comparison, raw-name storage, missing
+  focused test discovery, stale plan status, and missing verification evidence.
+- Exact intended-file generated-artifact and secret-pattern audits passed.
+- Hosted macOS app and XCTest-target compilation is recorded separately after
+  push; this plan claims only completed local evidence.

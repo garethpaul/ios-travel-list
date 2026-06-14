@@ -37,8 +37,9 @@ final class MyAppTests: XCTestCase {
     func testAddTravelItemAppendsUniqueItem() {
         let controller = TravelListTableViewController()
 
-        XCTAssertTrue(controller.addTravelItem(TravelListItem(name: "Passport")))
+        XCTAssertTrue(controller.addTravelItem(TravelListItem(name: "  Passport\n")))
         XCTAssertEqual(controller.travelItems.count, 1)
+        XCTAssertEqual(controller.travelItems.first?.itemName, "Passport")
     }
 
     func testAddTravelItemRejectsCaseInsensitiveDuplicates() {
@@ -47,7 +48,15 @@ final class MyAppTests: XCTestCase {
 
         XCTAssertFalse(controller.addTravelItem(TravelListItem(name: "Passport")))
         XCTAssertFalse(controller.addTravelItem(TravelListItem(name: "passport")))
+        XCTAssertFalse(controller.addTravelItem(TravelListItem(name: "  PASSPORT\n")))
         XCTAssertEqual(controller.travelItems.count, 1)
+    }
+
+    func testAddTravelItemRejectsBlankDirectCaller() {
+        let controller = TravelListTableViewController()
+
+        XCTAssertFalse(controller.addTravelItem(TravelListItem(name: "  \n\t  ")))
+        XCTAssertTrue(controller.travelItems.isEmpty)
     }
 
 }

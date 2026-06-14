@@ -27,6 +27,7 @@ SWIFT_5_PLAN = ROOT / "docs/plans/2026-06-10-swift-5-typed-list-build.md"
 XCTEST_TARGET_PLAN = ROOT / "docs/plans/2026-06-12-xctest-target-build.md"
 DUPLICATE_ITEM_PLAN = ROOT / "docs/plans/2026-06-13-duplicate-travel-item-guard.md"
 LOCATION_INDEPENDENT_MAKE_PLAN = ROOT / "docs/plans/2026-06-13-location-independent-make.md"
+CANONICAL_ADD_BOUNDARY_PLAN = ROOT / "docs/plans/2026-06-14-canonical-travel-item-add-boundary.md"
 PNG_SIGNATURE = b"\x89PNG\r\n\x1a\n"
 
 
@@ -129,6 +130,7 @@ def main():
         "docs/plans/2026-06-12-xctest-target-build.md",
         "docs/plans/2026-06-13-duplicate-travel-item-guard.md",
         "docs/plans/2026-06-13-location-independent-make.md",
+        "docs/plans/2026-06-14-canonical-travel-item-add-boundary.md",
         "docs/readme-overview.svg",
     ]
 
@@ -186,6 +188,7 @@ def main():
     xctest_target_plan = XCTEST_TARGET_PLAN.read_text(encoding="utf-8") if XCTEST_TARGET_PLAN.exists() else ""
     duplicate_item_plan = DUPLICATE_ITEM_PLAN.read_text(encoding="utf-8") if DUPLICATE_ITEM_PLAN.exists() else ""
     location_independent_make_plan = LOCATION_INDEPENDENT_MAKE_PLAN.read_text(encoding="utf-8") if LOCATION_INDEPENDENT_MAKE_PLAN.exists() else ""
+    canonical_add_boundary_plan = CANONICAL_ADD_BOUNDARY_PLAN.read_text(encoding="utf-8") if CANONICAL_ADD_BOUNDARY_PLAN.exists() else ""
     workflow = read(".github/workflows/check.yml")
 
     require(app_plist.get("CFBundleIdentifier", "").startswith("com.garethpaul."),
@@ -240,6 +243,9 @@ def main():
             "testRemoveTravelItemAtIndexRejectsInvalidIndexes" in tests and
             "testAddTravelItemAppendsUniqueItem" in tests and
             "testAddTravelItemRejectsCaseInsensitiveDuplicates" in tests and
+            "testAddTravelItemRejectsBlankDirectCaller" in tests and
+            'XCTAssertEqual(controller.travelItems.first?.itemName, "Passport")' in tests and
+            'TravelListItem(name: "  PASSPORT\\n")' in tests and
             "XCTAssertEqual" in tests and "XCTAssertNil" in tests and
             "XCTAssert(true" not in tests and "testPerformanceExample" not in tests,
             "TravelListTests must replace template tests with travel item normalization and removal assertions",
@@ -247,17 +253,27 @@ def main():
     add_item_index = table_controller.find("func addTravelItem(_ item: TravelListItem) -> Bool")
     next_table_method_index = table_controller.find("override func tableView", add_item_index)
     add_item_body = table_controller[add_item_index:next_table_method_index]
+    add_normalizer_index = add_item_body.find("guard let normalizedName = TravelListItem.normalizedName(item.itemName)")
+    add_duplicate_index = add_item_body.find("travelItems.contains(where:")
+    add_canonical_assignment_index = add_item_body.find("item.itemName = normalizedName")
+    add_append_index = add_item_body.find("travelItems.append(item)")
     unwind_start = table_controller.find("@IBAction func unwindToList")
     unwind_end = table_controller.find("override func viewDidLoad", unwind_start)
     unwind_body = table_controller[unwind_start:unwind_end]
     require(add_item_index != -1 and next_table_method_index != -1 and
+            add_normalizer_index != -1 and
             "travelItems.contains(where:" in add_item_body and
-            ".caseInsensitiveCompare(item.itemName) == .orderedSame" in add_item_body and
+            ".caseInsensitiveCompare(normalizedName) == .orderedSame" in add_item_body and
             "return false" in add_item_body and
-            add_item_body.find("return false") < add_item_body.find("travelItems.append(item)") < add_item_body.find("return true") and
+            add_normalizer_index < add_duplicate_index < add_canonical_assignment_index < add_append_index and
+            add_item_body.find("return false") < add_append_index < add_item_body.find("return true") and
             "if addTravelItem(item)" in unwind_body and
             unwind_body.find("if addTravelItem(item)") < unwind_body.find("tableView.reloadData()"),
             "TravelListTableViewController must reject case-insensitive duplicates before append and reload only on success",
+            failures)
+    require("TravelListItem.normalizedName(item.itemName)" in add_item_body and
+            "item.itemName = normalizedName" in add_item_body,
+            "TravelListTableViewController must normalize direct callers and store the canonical name",
             failures)
     require("travelItem = nil" in add_controller and "let textfield = textfield" in add_controller and
             "TravelListItem.normalizedName(textfield.text)" in add_controller,
@@ -424,6 +440,23 @@ def main():
             "All four Make gates" in duplicate_item_plan and
             "hostile mutations" in duplicate_item_plan.lower(),
             "duplicate travel item plan must record completed status and verification", failures)
+    canonical_add_statuses = re.findall(
+        r"^status: .+$", canonical_add_boundary_plan, flags=re.MULTILINE
+    )
+    canonical_add_verification = markdown_section(
+        canonical_add_boundary_plan, "Verification Completed"
+    )
+    require(canonical_add_statuses == ["status: completed"] and
+            "All four Make gates" in canonical_add_verification and
+            "absolute Makefile path" in canonical_add_verification and
+            "Six isolated hostile mutations" in canonical_add_verification and
+            "git diff --check" in canonical_add_verification and
+            "`xcodebuild` was unavailable" in canonical_add_verification and
+            re.search(r"\b(?:pending|todo|tbd|not run)\b",
+                      canonical_add_verification,
+                      re.IGNORECASE) is None,
+            "canonical travel-item add plan must record completed status and actual local verification",
+            failures)
     location_make_statuses = re.findall(
         r"^status: .+$", location_independent_make_plan, flags=re.MULTILINE
     )

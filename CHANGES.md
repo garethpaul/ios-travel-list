@@ -1,5 +1,10 @@
 # Changes
 
+## 2026-06-14
+
+- Canonicalized direct travel-item additions before duplicate comparison and
+  rejected blank names at the collection mutation boundary.
+
 ## 2026-06-13
 
 - Made all Make verification aliases location-independent when invoked through

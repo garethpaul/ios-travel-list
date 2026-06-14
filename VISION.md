@@ -24,6 +24,8 @@ Priority:
 - Keep table rendering guarded against stale local indexes
 - Keep item removal index handling guarded before local list mutation
 - Keep duplicate item checks case-insensitive and ahead of list mutation
+- Keep collection add-boundary normalization ahead of duplicate checks and store
+  only canonical display names
 - Keep fallback cell rendering configurable for valid rows
 - Clear stale cell state when invalid or malformed rows use fallback cells
 - Keep the travel logo scoped to each navigation item title view
