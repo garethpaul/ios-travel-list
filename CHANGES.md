@@ -1,5 +1,10 @@
 # Changes
 
+## 2026-06-15
+
+- Normalized existing item names during duplicate checks so legacy or direct
+  noncanonical rows cannot admit an equivalent canonical item.
+
 ## 2026-06-14
 
 - Canonicalized direct travel-item additions before duplicate comparison and

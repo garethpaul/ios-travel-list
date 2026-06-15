@@ -28,6 +28,7 @@ XCTEST_TARGET_PLAN = ROOT / "docs/plans/2026-06-12-xctest-target-build.md"
 DUPLICATE_ITEM_PLAN = ROOT / "docs/plans/2026-06-13-duplicate-travel-item-guard.md"
 LOCATION_INDEPENDENT_MAKE_PLAN = ROOT / "docs/plans/2026-06-13-location-independent-make.md"
 CANONICAL_ADD_BOUNDARY_PLAN = ROOT / "docs/plans/2026-06-14-canonical-travel-item-add-boundary.md"
+NORMALIZED_EXISTING_DUPLICATE_PLAN = ROOT / "docs/plans/2026-06-15-normalized-existing-duplicate-guard.md"
 PNG_SIGNATURE = b"\x89PNG\r\n\x1a\n"
 
 
@@ -131,6 +132,7 @@ def main():
         "docs/plans/2026-06-13-duplicate-travel-item-guard.md",
         "docs/plans/2026-06-13-location-independent-make.md",
         "docs/plans/2026-06-14-canonical-travel-item-add-boundary.md",
+        "docs/plans/2026-06-15-normalized-existing-duplicate-guard.md",
         "docs/readme-overview.svg",
     ]
 
@@ -189,6 +191,7 @@ def main():
     duplicate_item_plan = DUPLICATE_ITEM_PLAN.read_text(encoding="utf-8") if DUPLICATE_ITEM_PLAN.exists() else ""
     location_independent_make_plan = LOCATION_INDEPENDENT_MAKE_PLAN.read_text(encoding="utf-8") if LOCATION_INDEPENDENT_MAKE_PLAN.exists() else ""
     canonical_add_boundary_plan = CANONICAL_ADD_BOUNDARY_PLAN.read_text(encoding="utf-8") if CANONICAL_ADD_BOUNDARY_PLAN.exists() else ""
+    normalized_existing_duplicate_plan = NORMALIZED_EXISTING_DUPLICATE_PLAN.read_text(encoding="utf-8") if NORMALIZED_EXISTING_DUPLICATE_PLAN.exists() else ""
     workflow = read(".github/workflows/check.yml")
 
     require(app_plist.get("CFBundleIdentifier", "").startswith("com.garethpaul."),
@@ -243,9 +246,12 @@ def main():
             "testRemoveTravelItemAtIndexRejectsInvalidIndexes" in tests and
             "testAddTravelItemAppendsUniqueItem" in tests and
             "testAddTravelItemRejectsCaseInsensitiveDuplicates" in tests and
+            "testAddTravelItemRejectsDuplicateOfNoncanonicalExistingItem" in tests and
             "testAddTravelItemRejectsBlankDirectCaller" in tests and
             'XCTAssertEqual(controller.travelItems.first?.itemName, "Passport")' in tests and
             'TravelListItem(name: "  PASSPORT\\n")' in tests and
+            'let existingItem = TravelListItem(name: "  Passport\\n")' in tests and
+            'XCTAssertEqual(existingItem.itemName, "  Passport\\n")' in tests and
             "XCTAssertEqual" in tests and "XCTAssertNil" in tests and
             "XCTAssert(true" not in tests and "testPerformanceExample" not in tests,
             "TravelListTests must replace template tests with travel item normalization and removal assertions",
@@ -272,8 +278,10 @@ def main():
             "TravelListTableViewController must reject case-insensitive duplicates before append and reload only on success",
             failures)
     require("TravelListItem.normalizedName(item.itemName)" in add_item_body and
+            "TravelListItem.normalizedName(existingItem.itemName)" in add_item_body and
+            "existingName.caseInsensitiveCompare(normalizedName) == .orderedSame" in add_item_body and
             "item.itemName = normalizedName" in add_item_body,
-            "TravelListTableViewController must normalize direct callers and store the canonical name",
+            "TravelListTableViewController must normalize both duplicate inputs and store the canonical candidate name",
             failures)
     require("travelItem = nil" in add_controller and "let textfield = textfield" in add_controller and
             "TravelListItem.normalizedName(textfield.text)" in add_controller,
@@ -456,6 +464,23 @@ def main():
                       canonical_add_verification,
                       re.IGNORECASE) is None,
             "canonical travel-item add plan must record completed status and actual local verification",
+            failures)
+    normalized_existing_statuses = re.findall(
+        r"^status: .+$", normalized_existing_duplicate_plan, flags=re.MULTILINE
+    )
+    normalized_existing_verification = markdown_section(
+        normalized_existing_duplicate_plan, "Verification Completed"
+    )
+    require(normalized_existing_statuses == ["status: completed"] and
+            "All four Make gates" in normalized_existing_verification and
+            "absolute Makefile path" in normalized_existing_verification and
+            "Five isolated hostile mutations" in normalized_existing_verification and
+            "git diff --check" in normalized_existing_verification and
+            "`xcodebuild` was unavailable" in normalized_existing_verification and
+            re.search(r"\b(?:pending|todo|tbd|not run)\b",
+                      normalized_existing_verification,
+                      re.IGNORECASE) is None,
+            "normalized existing duplicate plan must record completed status and actual local verification",
             failures)
     location_make_statuses = re.findall(
         r"^status: .+$", location_independent_make_plan, flags=re.MULTILINE

@@ -52,6 +52,16 @@ final class MyAppTests: XCTestCase {
         XCTAssertEqual(controller.travelItems.count, 1)
     }
 
+    func testAddTravelItemRejectsDuplicateOfNoncanonicalExistingItem() {
+        let controller = TravelListTableViewController()
+        let existingItem = TravelListItem(name: "  Passport\n")
+        controller.travelItems.append(existingItem)
+
+        XCTAssertFalse(controller.addTravelItem(TravelListItem(name: "passport")))
+        XCTAssertEqual(controller.travelItems.count, 1)
+        XCTAssertEqual(existingItem.itemName, "  Passport\n")
+    }
+
     func testAddTravelItemRejectsBlankDirectCaller() {
         let controller = TravelListTableViewController()
 

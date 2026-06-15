@@ -81,8 +81,12 @@ class TravelListTableViewController: UITableViewController {
             return false
         }
 
-        guard !travelItems.contains(where: {
-            $0.itemName.caseInsensitiveCompare(normalizedName) == .orderedSame
+        guard !travelItems.contains(where: { existingItem in
+            guard let existingName = TravelListItem.normalizedName(existingItem.itemName) else {
+                return false
+            }
+
+            return existingName.caseInsensitiveCompare(normalizedName) == .orderedSame
         }) else {
             return false
         }

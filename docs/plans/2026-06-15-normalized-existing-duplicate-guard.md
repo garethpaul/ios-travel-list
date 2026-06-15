@@ -1,6 +1,6 @@
 # Normalized Existing Duplicate Guard
 
-status: planned
+status: completed
 
 ## Context
 
@@ -41,3 +41,25 @@ row even though the collection boundary is intended to reject equivalent names.
   the focused test, or falsify completed plan evidence.
 - Audit the exact diff, generated artifacts, and intended files for secret
   patterns before committing.
+
+## Work Completed
+
+- Normalized existing item names before case-insensitive duplicate comparison
+  while preserving their stored display text.
+- Added focused XCTest and static contracts for padded existing-item names.
+- Recorded the behavior change in the changelog.
+
+## Verification Completed
+
+- All four Make gates passed from the checkout and reported that `xcodebuild` was unavailable,
+  so this Linux host exercised the complete static baseline.
+- The full gate passed from an external directory through the absolute Makefile path.
+- `python3 -m py_compile scripts/check-baseline.py`, `sh -n build.sh`, plist,
+  storyboard, workspace, project, asset, and workflow parsing, and
+  `git diff --check` passed.
+- Five isolated hostile mutations were rejected: missing existing-name
+  normalization, raw existing-name comparison, missing focused test discovery,
+  unfinished plan status, and weakened mutation evidence.
+- Exact intended-file generated-artifact and secret-pattern audits passed.
+- Hosted macOS app and XCTest-target compilation is recorded separately after
+  push; this plan claims only completed local evidence.
