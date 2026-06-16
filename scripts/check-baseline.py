@@ -29,6 +29,7 @@ DUPLICATE_ITEM_PLAN = ROOT / "docs/plans/2026-06-13-duplicate-travel-item-guard.
 LOCATION_INDEPENDENT_MAKE_PLAN = ROOT / "docs/plans/2026-06-13-location-independent-make.md"
 CANONICAL_ADD_BOUNDARY_PLAN = ROOT / "docs/plans/2026-06-14-canonical-travel-item-add-boundary.md"
 NORMALIZED_EXISTING_DUPLICATE_PLAN = ROOT / "docs/plans/2026-06-15-normalized-existing-duplicate-guard.md"
+CONTROL_CHARACTER_PLAN = ROOT / "docs/plans/2026-06-16-travel-item-control-character-guard.md"
 PNG_SIGNATURE = b"\x89PNG\r\n\x1a\n"
 
 
@@ -133,6 +134,7 @@ def main():
         "docs/plans/2026-06-13-location-independent-make.md",
         "docs/plans/2026-06-14-canonical-travel-item-add-boundary.md",
         "docs/plans/2026-06-15-normalized-existing-duplicate-guard.md",
+        "docs/plans/2026-06-16-travel-item-control-character-guard.md",
         "docs/readme-overview.svg",
     ]
 
@@ -192,6 +194,7 @@ def main():
     location_independent_make_plan = LOCATION_INDEPENDENT_MAKE_PLAN.read_text(encoding="utf-8") if LOCATION_INDEPENDENT_MAKE_PLAN.exists() else ""
     canonical_add_boundary_plan = CANONICAL_ADD_BOUNDARY_PLAN.read_text(encoding="utf-8") if CANONICAL_ADD_BOUNDARY_PLAN.exists() else ""
     normalized_existing_duplicate_plan = NORMALIZED_EXISTING_DUPLICATE_PLAN.read_text(encoding="utf-8") if NORMALIZED_EXISTING_DUPLICATE_PLAN.exists() else ""
+    control_character_plan = CONTROL_CHARACTER_PLAN.read_text(encoding="utf-8") if CONTROL_CHARACTER_PLAN.exists() else ""
     workflow = read(".github/workflows/check.yml")
 
     require(app_plist.get("CFBundleIdentifier", "").startswith("com.garethpaul."),
@@ -237,11 +240,19 @@ def main():
                 failures)
     require("class func normalizedName(_ name: String?) -> String?" in item_model and
             "trimmingCharacters(in: .whitespacesAndNewlines)" in item_model and
-            "itemName.isEmpty" in item_model and "return nil" in item_model,
-            "TravelListItem must expose a shared optional name normalizer",
+            "itemName.isEmpty" in item_model and
+            "itemName.rangeOfCharacter(from: .controlCharacters) == nil" in item_model and
+            item_model.count("return nil") >= 2,
+            "TravelListItem must expose a shared optional name normalizer with a control-character boundary",
             failures)
     require("testTravelItemNameNormalizationTrimsWhitespace" in tests and
             "testTravelItemNameNormalizationRejectsBlankNames" in tests and
+            "testTravelItemNameNormalizationRejectsEmbeddedControlCharacters" in tests and
+            "testTravelItemNameNormalizationPreservesInternationalizedNames" in tests and
+            'TravelListItem.normalizedName("Pass\\nport")' in tests and
+            'TravelListItem.normalizedName("Pass\\tport")' in tests and
+            'TravelListItem.normalizedName("Pass\\u{0}port")' in tests and
+            'XCTAssertEqual(TravelListItem.normalizedName("  Café Guide  "), "Café Guide")' in tests and
             "testRemoveTravelItemAtIndexRemovesValidItem" in tests and
             "testRemoveTravelItemAtIndexRejectsInvalidIndexes" in tests and
             "testAddTravelItemAppendsUniqueItem" in tests and
@@ -373,6 +384,9 @@ def main():
     require("normalizer tests" in readme.lower(),
             "README must document travel item normalizer tests",
             failures)
+    require("embedded control-character guard" in readme.lower(),
+            "README must document the embedded control-character boundary",
+            failures)
     require("removal index" in readme.lower(),
             "README must document travel item removal index guardrails",
             failures)
@@ -387,6 +401,9 @@ def main():
     require("normalizer tests" in vision.lower(),
             "VISION must describe travel item normalizer tests",
             failures)
+    require("embedded-control" in vision.lower() and "internationalized" in vision.lower(),
+            "VISION must preserve control-character rejection and internationalized-name coverage",
+            failures)
     require("removal index" in vision.lower(),
             "VISION must describe travel item removal index guardrails",
             failures)
@@ -399,6 +416,8 @@ def main():
             failures)
     require("duplicate item checks" in security.lower(),
             "SECURITY must document duplicate item guardrails", failures)
+    require("embedded control-character rejection" in security.lower(),
+            "SECURITY must document the control-character boundary", failures)
     require("GitHub Actions" in changes and "whitespace-only" in changes and "hex color" in changes and "cell rendering" in changes and
             "fallback cell" in changes.lower() and "stale cell" in changes.lower() and "title view" in changes.lower() and
             "index" in changes.lower() and "textfield outlet" in changes.lower() and "name normalizer" in changes.lower() and "make check" in changes,
@@ -415,6 +434,9 @@ def main():
             failures)
     require("duplicate item checks" in changes.lower(),
             "CHANGES must record duplicate item updates", failures)
+    require("embedded control characters" in changes.lower() and
+            "internationalized display names" in changes.lower(),
+            "CHANGES must record the control-character boundary", failures)
     require("status: completed" in baseline_plan and "status: completed" in cell_index_plan and
             "status: completed" in cell_fallback_plan and "status: completed" in cell_reset_plan,
             "plans must be marked completed",
@@ -481,6 +503,23 @@ def main():
                       normalized_existing_verification,
                       re.IGNORECASE) is None,
             "normalized existing duplicate plan must record completed status and actual local verification",
+            failures)
+    control_character_statuses = re.findall(
+        r"^status: .+$", control_character_plan, flags=re.MULTILINE
+    )
+    control_character_verification = markdown_section(
+        control_character_plan, "Verification Completed"
+    )
+    require(control_character_statuses == ["status: completed"] and
+            "All four Make gates" in control_character_verification and
+            "absolute Makefile path" in control_character_verification and
+            "Six isolated hostile mutations" in control_character_verification and
+            "git diff --check" in control_character_verification and
+            "`xcodebuild`" in control_character_verification and
+            re.search(r"\b(?:pending|todo|tbd|not run)\b",
+                      control_character_verification,
+                      re.IGNORECASE) is None,
+            "travel item control-character plan must record completed status and actual local verification",
             failures)
     location_make_statuses = re.findall(
         r"^status: .+$", location_independent_make_plan, flags=re.MULTILINE

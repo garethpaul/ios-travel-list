@@ -1,5 +1,10 @@
 # Changes
 
+## 2026-06-16
+
+- Rejected embedded control characters at the shared travel-item name boundary
+  while preserving ordinary internationalized display names.
+
 ## 2026-06-15
 
 - Normalized existing item names during duplicate checks so legacy or direct

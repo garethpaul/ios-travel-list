@@ -77,7 +77,7 @@ make build
 make check
 ```
 
-Each Make gate runs `scripts/check-baseline.py`, parses plist/storyboard/asset metadata, checks image resources and Xcode wiring, verifies typed travel-item storage, the shared name normalizer, guarded textfield outlet reads, normalizer tests, navigation logo title view ownership, fallback cell reset, table/removal index guards, invalid color fallback, and side-effect-free cell rendering, and guards against logging, network, upload, analytics, or persistence behavior. When Xcode is available the same gate compiles the unsigned app and XCTest target; otherwise the build step skips cleanly.
+Each Make gate runs `scripts/check-baseline.py`, parses plist/storyboard/asset metadata, checks image resources and Xcode wiring, verifies typed travel-item storage, the shared name normalizer and its embedded control-character guard, guarded textfield outlet reads, normalizer tests, navigation logo title view ownership, fallback cell reset, table/removal index guards, invalid color fallback, and side-effect-free cell rendering, and guards against logging, network, upload, analytics, or persistence behavior. When Xcode is available the same gate compiles the unsigned app and XCTest target; otherwise the build step skips cleanly.
 
 Pinned `macos-15` GitHub Actions runs `make check` and compiles the unsigned
 Swift 5 app and XCTest target. This hosted validation does not inspect travel-item data,
@@ -114,6 +114,8 @@ When the required SDK or runtime is unavailable, use static checks and source re
   item guardrail.
 - See `docs/plans/2026-06-14-canonical-travel-item-add-boundary.md` for direct
   caller normalization at the collection mutation boundary.
+- See `docs/plans/2026-06-16-travel-item-control-character-guard.md` for the
+  embedded control-character boundary.
 - See `docs/plans/2026-06-09-navigation-logo-title-view.md` for the navigation logo title view guardrail.
 - See `docs/plans/2026-06-10-add-textfield-outlet-guard.md` for the textfield outlet guardrail.
 - See `docs/plans/2026-06-09-make-gate-aliases.md` for the local gate alias guardrail.

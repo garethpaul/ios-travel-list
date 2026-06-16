@@ -17,6 +17,16 @@ final class MyAppTests: XCTestCase {
         XCTAssertNil(TravelListItem.normalizedName(nil), "Missing travel item names should be ignored")
     }
 
+    func testTravelItemNameNormalizationRejectsEmbeddedControlCharacters() {
+        XCTAssertNil(TravelListItem.normalizedName("Pass\nport"))
+        XCTAssertNil(TravelListItem.normalizedName("Pass\tport"))
+        XCTAssertNil(TravelListItem.normalizedName("Pass\u{0}port"))
+    }
+
+    func testTravelItemNameNormalizationPreservesInternationalizedNames() {
+        XCTAssertEqual(TravelListItem.normalizedName("  Café Guide  "), "Café Guide")
+    }
+
     func testRemoveTravelItemAtIndexRemovesValidItem() {
         let controller = TravelListTableViewController()
         controller.travelItems.append(TravelListItem(name: "Passport"))
