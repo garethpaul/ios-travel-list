@@ -1,5 +1,10 @@
 # Changes
 
+## 2026-06-17
+
+- Rejected embedded Unicode line separators at the shared travel-item name
+  boundary and added focused XCTest coverage.
+
 ## 2026-06-16
 
 - Rejected embedded control characters at the shared travel-item name boundary

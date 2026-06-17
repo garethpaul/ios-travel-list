@@ -30,6 +30,7 @@ LOCATION_INDEPENDENT_MAKE_PLAN = ROOT / "docs/plans/2026-06-13-location-independ
 CANONICAL_ADD_BOUNDARY_PLAN = ROOT / "docs/plans/2026-06-14-canonical-travel-item-add-boundary.md"
 NORMALIZED_EXISTING_DUPLICATE_PLAN = ROOT / "docs/plans/2026-06-15-normalized-existing-duplicate-guard.md"
 CONTROL_CHARACTER_PLAN = ROOT / "docs/plans/2026-06-16-travel-item-control-character-guard.md"
+UNICODE_LINE_SEPARATOR_PLAN = ROOT / "docs/plans/2026-06-17-020-reject-unicode-line-separators-plan.md"
 PNG_SIGNATURE = b"\x89PNG\r\n\x1a\n"
 
 
@@ -135,6 +136,7 @@ def main():
         "docs/plans/2026-06-14-canonical-travel-item-add-boundary.md",
         "docs/plans/2026-06-15-normalized-existing-duplicate-guard.md",
         "docs/plans/2026-06-16-travel-item-control-character-guard.md",
+        "docs/plans/2026-06-17-020-reject-unicode-line-separators-plan.md",
         "docs/readme-overview.svg",
     ]
 
@@ -195,6 +197,7 @@ def main():
     canonical_add_boundary_plan = CANONICAL_ADD_BOUNDARY_PLAN.read_text(encoding="utf-8") if CANONICAL_ADD_BOUNDARY_PLAN.exists() else ""
     normalized_existing_duplicate_plan = NORMALIZED_EXISTING_DUPLICATE_PLAN.read_text(encoding="utf-8") if NORMALIZED_EXISTING_DUPLICATE_PLAN.exists() else ""
     control_character_plan = CONTROL_CHARACTER_PLAN.read_text(encoding="utf-8") if CONTROL_CHARACTER_PLAN.exists() else ""
+    unicode_line_separator_plan = UNICODE_LINE_SEPARATOR_PLAN.read_text(encoding="utf-8") if UNICODE_LINE_SEPARATOR_PLAN.exists() else ""
     workflow = read(".github/workflows/check.yml")
 
     require(app_plist.get("CFBundleIdentifier", "").startswith("com.garethpaul."),
@@ -242,16 +245,20 @@ def main():
             "trimmingCharacters(in: .whitespacesAndNewlines)" in item_model and
             "itemName.isEmpty" in item_model and
             "itemName.rangeOfCharacter(from: .controlCharacters) == nil" in item_model and
-            item_model.count("return nil") >= 2,
-            "TravelListItem must expose a shared optional name normalizer with a control-character boundary",
+            "itemName.rangeOfCharacter(from: .newlines) == nil" in item_model and
+            item_model.count("return nil") >= 3,
+            "TravelListItem must expose a shared optional name normalizer with control-character and newline boundaries",
             failures)
     require("testTravelItemNameNormalizationTrimsWhitespace" in tests and
             "testTravelItemNameNormalizationRejectsBlankNames" in tests and
             "testTravelItemNameNormalizationRejectsEmbeddedControlCharacters" in tests and
+            "testTravelItemNameNormalizationRejectsUnicodeLineSeparators" in tests and
             "testTravelItemNameNormalizationPreservesInternationalizedNames" in tests and
             'TravelListItem.normalizedName("Pass\\nport")' in tests and
             'TravelListItem.normalizedName("Pass\\tport")' in tests and
             'TravelListItem.normalizedName("Pass\\u{0}port")' in tests and
+            'TravelListItem.normalizedName("Pass\\u{2028}port")' in tests and
+            'TravelListItem.normalizedName("Pass\\u{2029}port")' in tests and
             'XCTAssertEqual(TravelListItem.normalizedName("  Café Guide  "), "Café Guide")' in tests and
             "testRemoveTravelItemAtIndexRemovesValidItem" in tests and
             "testRemoveTravelItemAtIndexRejectsInvalidIndexes" in tests and
@@ -387,6 +394,9 @@ def main():
     require("embedded control-character guard" in readme.lower(),
             "README must document the embedded control-character boundary",
             failures)
+    require("unicode line separators" in readme.lower(),
+            "README must document the Unicode newline boundary",
+            failures)
     require("removal index" in readme.lower(),
             "README must document travel item removal index guardrails",
             failures)
@@ -404,6 +414,9 @@ def main():
     require("embedded-control" in vision.lower() and "internationalized" in vision.lower(),
             "VISION must preserve control-character rejection and internationalized-name coverage",
             failures)
+    require("unicode line separators" in vision.lower(),
+            "VISION must preserve Unicode newline rejection",
+            failures)
     require("removal index" in vision.lower(),
             "VISION must describe travel item removal index guardrails",
             failures)
@@ -418,6 +431,8 @@ def main():
             "SECURITY must document duplicate item guardrails", failures)
     require("embedded control-character rejection" in security.lower(),
             "SECURITY must document the control-character boundary", failures)
+    require("unicode line separators" in security.lower(),
+            "SECURITY must document the Unicode newline boundary", failures)
     require("GitHub Actions" in changes and "whitespace-only" in changes and "hex color" in changes and "cell rendering" in changes and
             "fallback cell" in changes.lower() and "stale cell" in changes.lower() and "title view" in changes.lower() and
             "index" in changes.lower() and "textfield outlet" in changes.lower() and "name normalizer" in changes.lower() and "make check" in changes,
@@ -437,6 +452,16 @@ def main():
     require("embedded control characters" in changes.lower() and
             "internationalized display names" in changes.lower(),
             "CHANGES must record the control-character boundary", failures)
+    require("unicode line separators" in changes.lower(),
+            "CHANGES must record the Unicode newline boundary", failures)
+    require("title: Unicode Line Separator Guard" in unicode_line_separator_plan and
+            "type: fix" in unicode_line_separator_plan and
+            "date: 2026-06-17" in unicode_line_separator_plan and
+            "R1." in unicode_line_separator_plan and "R6." in unicode_line_separator_plan and
+            "CharacterSet.newlines" in unicode_line_separator_plan and
+            re.search(r"(?mi)^status:\s*", unicode_line_separator_plan) is None,
+            "Unicode line separator plan must preserve modern metadata and requirements without a legacy status field",
+            failures)
     require("status: completed" in baseline_plan and "status: completed" in cell_index_plan and
             "status: completed" in cell_fallback_plan and "status: completed" in cell_reset_plan,
             "plans must be marked completed",

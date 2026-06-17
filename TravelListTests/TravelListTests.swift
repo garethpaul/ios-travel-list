@@ -23,6 +23,11 @@ final class MyAppTests: XCTestCase {
         XCTAssertNil(TravelListItem.normalizedName("Pass\u{0}port"))
     }
 
+    func testTravelItemNameNormalizationRejectsUnicodeLineSeparators() {
+        XCTAssertNil(TravelListItem.normalizedName("Pass\u{2028}port"))
+        XCTAssertNil(TravelListItem.normalizedName("Pass\u{2029}port"))
+    }
+
     func testTravelItemNameNormalizationPreservesInternationalizedNames() {
         XCTAssertEqual(TravelListItem.normalizedName("  Café Guide  "), "Café Guide")
     }

@@ -20,6 +20,10 @@ final class TravelListItem: NSObject {
             return nil
         }
 
+        guard itemName.rangeOfCharacter(from: .newlines) == nil else {
+            return nil
+        }
+
         return itemName
     }
 }
