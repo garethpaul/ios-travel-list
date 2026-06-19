@@ -55,15 +55,15 @@ The checked-in project has no external dependency manifest. Use Xcode for full b
 - Run `./build.sh` to compile the unsigned Swift 5 app for the simulator when
   Xcode is installed.
 - The sample is local-first and keeps list items in memory.
-- New item names go through a shared name normalizer at both UI creation and the collection add boundary, and whitespace-only entries are ignored.
+- New item names go through a shared name normalizer at both UI creation and the collection add boundary; whitespace-only entries are ignored and accepted Unicode horizontal whitespace runs are stored as one ordinary space.
 - Add-screen textfield outlet reads fall back through the same normalizer when the outlet is unavailable.
-- Focused normalizer tests cover trimmed, blank, missing, control-character, and
-  Unicode line separator travel item names.
+- Focused normalizer tests cover trimmed, blank, missing, control-character,
+  Unicode line separator, and horizontal Unicode whitespace travel item names.
 - Cell rendering uses a fallback cell that can still display an item if storyboard reuse wiring is unavailable.
 - Invalid or malformed rows clear stale cell text and accessory state before the fallback cell is returned.
 - Item removal index checks reject stale or invalid row selections before mutating the local list.
-- Duplicate item checks reject case-insensitive name matches before appending or
-  reloading the table.
+- Duplicate item checks use a fixed-locale case- and width-insensitive key for
+  both new and existing names before appending or reloading the table.
 - The travel logo is scoped to each navigation item title view instead of being
   added as a navigation-controller overlay.
 
@@ -78,7 +78,7 @@ make build
 make check
 ```
 
-Each Make gate runs `scripts/check-baseline.py`, parses plist/storyboard/asset metadata, checks image resources and Xcode wiring, verifies typed travel-item storage, the shared name normalizer and its embedded control-character guard, rejects Unicode line separators, checks guarded textfield outlet reads, normalizer tests, navigation logo title view ownership, fallback cell reset, table/removal index guards, invalid color fallback, and side-effect-free cell rendering, and guards against logging, network, upload, analytics, or persistence behavior. When Xcode is available the same gate compiles the unsigned app and XCTest target; otherwise the build step skips cleanly.
+Each Make gate runs `scripts/check-baseline.py` plus five hostile canonicalization mutations, parses plist/storyboard/asset metadata, checks image resources and Xcode wiring, verifies typed travel-item storage, the shared name normalizer and its embedded control-character guard, rejects Unicode line separators, canonicalizes horizontal Unicode whitespace, checks the fixed-locale case/width duplicate key, guarded textfield outlet reads, focused XCTest source, navigation logo title view ownership, fallback cell reset, table/removal index guards, invalid color fallback, and side-effect-free cell rendering, and guards against logging, network, upload, analytics, or persistence behavior. When Xcode is available the same gate compiles the unsigned app and XCTest target; otherwise the build step skips cleanly.
 
 Pinned `macos-15` GitHub Actions runs `make check` and compiles the unsigned
 Swift 5 app and XCTest target. This hosted validation does not inspect travel-item data,

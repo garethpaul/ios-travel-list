@@ -80,13 +80,14 @@ class TravelListTableViewController: UITableViewController {
         guard let normalizedName = TravelListItem.normalizedName(item.itemName) else {
             return false
         }
+        let duplicateKey = TravelListItem.duplicateKey(forNormalizedName: normalizedName)
 
         guard !travelItems.contains(where: { existingItem in
             guard let existingName = TravelListItem.normalizedName(existingItem.itemName) else {
                 return false
             }
 
-            return existingName.caseInsensitiveCompare(normalizedName) == .orderedSame
+            return TravelListItem.duplicateKey(forNormalizedName: existingName) == duplicateKey
         }) else {
             return false
         }

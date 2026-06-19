@@ -28,6 +28,10 @@ final class MyAppTests: XCTestCase {
         XCTAssertNil(TravelListItem.normalizedName("Pass\u{2029}port"))
     }
 
+    func testTravelItemNameNormalizationCollapsesUnicodeHorizontalWhitespace() {
+        XCTAssertEqual(TravelListItem.normalizedName("Travel\u{00A0}\u{2007} Guide"), "Travel Guide")
+    }
+
     func testTravelItemNameNormalizationPreservesInternationalizedNames() {
         XCTAssertEqual(TravelListItem.normalizedName("  Café Guide  "), "Café Guide")
     }
@@ -75,6 +79,22 @@ final class MyAppTests: XCTestCase {
         XCTAssertFalse(controller.addTravelItem(TravelListItem(name: "passport")))
         XCTAssertEqual(controller.travelItems.count, 1)
         XCTAssertEqual(existingItem.itemName, "  Passport\n")
+    }
+
+    func testAddTravelItemRejectsWidthVariantDuplicate() {
+        let controller = TravelListTableViewController()
+        controller.travelItems.append(TravelListItem(name: "Passport"))
+
+        XCTAssertFalse(controller.addTravelItem(TravelListItem(name: "Ｐａｓｓｐｏｒｔ")))
+        XCTAssertEqual(controller.travelItems.count, 1)
+    }
+
+    func testAddTravelItemRejectsUnicodeWhitespaceVariantDuplicate() {
+        let controller = TravelListTableViewController()
+        controller.travelItems.append(TravelListItem(name: "Travel Guide"))
+
+        XCTAssertFalse(controller.addTravelItem(TravelListItem(name: "Travel\u{00A0}\u{2007}Guide")))
+        XCTAssertEqual(controller.travelItems.count, 1)
     }
 
     func testAddTravelItemRejectsBlankDirectCaller() {

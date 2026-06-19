@@ -31,6 +31,7 @@ CANONICAL_ADD_BOUNDARY_PLAN = ROOT / "docs/plans/2026-06-14-canonical-travel-ite
 NORMALIZED_EXISTING_DUPLICATE_PLAN = ROOT / "docs/plans/2026-06-15-normalized-existing-duplicate-guard.md"
 CONTROL_CHARACTER_PLAN = ROOT / "docs/plans/2026-06-16-travel-item-control-character-guard.md"
 UNICODE_LINE_SEPARATOR_PLAN = ROOT / "docs/plans/2026-06-17-020-reject-unicode-line-separators-plan.md"
+UNICODE_CANONICALIZATION_PLAN = ROOT / "docs/plans/2026-06-19-unicode-travel-item-canonicalization.md"
 PNG_SIGNATURE = b"\x89PNG\r\n\x1a\n"
 
 
@@ -137,6 +138,7 @@ def main():
         "docs/plans/2026-06-15-normalized-existing-duplicate-guard.md",
         "docs/plans/2026-06-16-travel-item-control-character-guard.md",
         "docs/plans/2026-06-17-020-reject-unicode-line-separators-plan.md",
+        "docs/plans/2026-06-19-unicode-travel-item-canonicalization.md",
         "docs/readme-overview.svg",
     ]
 
@@ -246,13 +248,23 @@ def main():
             "itemName.isEmpty" in item_model and
             "itemName.rangeOfCharacter(from: .controlCharacters) == nil" in item_model and
             "itemName.rangeOfCharacter(from: .newlines) == nil" in item_model and
+            "components(separatedBy: .whitespaces)" in item_model and
+            ".filter { !$0.isEmpty }" in item_model and
+            '.joined(separator: " ")' in item_model and
             item_model.count("return nil") >= 3,
-            "TravelListItem must expose a shared optional name normalizer with control-character and newline boundaries",
+            "TravelListItem must expose a shared optional name normalizer with control, newline, and horizontal-whitespace boundaries",
+            failures)
+    require("class func duplicateKey(forNormalizedName name: String) -> String" in item_model and
+            "options: [.caseInsensitive, .widthInsensitive]" in item_model and
+            'Locale(identifier: "en_US_POSIX")' in item_model and
+            ".precomposedStringWithCanonicalMapping" in item_model,
+            "TravelListItem must expose a stable locale-independent case and width duplicate key",
             failures)
     require("testTravelItemNameNormalizationTrimsWhitespace" in tests and
             "testTravelItemNameNormalizationRejectsBlankNames" in tests and
             "testTravelItemNameNormalizationRejectsEmbeddedControlCharacters" in tests and
             "testTravelItemNameNormalizationRejectsUnicodeLineSeparators" in tests and
+            "testTravelItemNameNormalizationCollapsesUnicodeHorizontalWhitespace" in tests and
             "testTravelItemNameNormalizationPreservesInternationalizedNames" in tests and
             'TravelListItem.normalizedName("Pass\\nport")' in tests and
             'TravelListItem.normalizedName("Pass\\tport")' in tests and
@@ -265,6 +277,8 @@ def main():
             "testAddTravelItemAppendsUniqueItem" in tests and
             "testAddTravelItemRejectsCaseInsensitiveDuplicates" in tests and
             "testAddTravelItemRejectsDuplicateOfNoncanonicalExistingItem" in tests and
+            "testAddTravelItemRejectsWidthVariantDuplicate" in tests and
+            "testAddTravelItemRejectsUnicodeWhitespaceVariantDuplicate" in tests and
             "testAddTravelItemRejectsBlankDirectCaller" in tests and
             'XCTAssertEqual(controller.travelItems.first?.itemName, "Passport")' in tests and
             'TravelListItem(name: "  PASSPORT\\n")' in tests and
@@ -278,6 +292,7 @@ def main():
     next_table_method_index = table_controller.find("override func tableView", add_item_index)
     add_item_body = table_controller[add_item_index:next_table_method_index]
     add_normalizer_index = add_item_body.find("guard let normalizedName = TravelListItem.normalizedName(item.itemName)")
+    add_duplicate_key_index = add_item_body.find("let duplicateKey = TravelListItem.duplicateKey(forNormalizedName: normalizedName)")
     add_duplicate_index = add_item_body.find("travelItems.contains(where:")
     add_canonical_assignment_index = add_item_body.find("item.itemName = normalizedName")
     add_append_index = add_item_body.find("travelItems.append(item)")
@@ -286,20 +301,22 @@ def main():
     unwind_body = table_controller[unwind_start:unwind_end]
     require(add_item_index != -1 and next_table_method_index != -1 and
             add_normalizer_index != -1 and
+            add_duplicate_key_index != -1 and
             "travelItems.contains(where:" in add_item_body and
-            ".caseInsensitiveCompare(normalizedName) == .orderedSame" in add_item_body and
+            "TravelListItem.duplicateKey(forNormalizedName: existingName) == duplicateKey" in add_item_body and
             "return false" in add_item_body and
-            add_normalizer_index < add_duplicate_index < add_canonical_assignment_index < add_append_index and
+            add_normalizer_index < add_duplicate_key_index < add_duplicate_index < add_canonical_assignment_index < add_append_index and
             add_item_body.find("return false") < add_append_index < add_item_body.find("return true") and
             "if addTravelItem(item)" in unwind_body and
             unwind_body.find("if addTravelItem(item)") < unwind_body.find("tableView.reloadData()"),
-            "TravelListTableViewController must reject case-insensitive duplicates before append and reload only on success",
+            "TravelListTableViewController must reject canonical duplicates before append and reload only on success",
             failures)
     require("TravelListItem.normalizedName(item.itemName)" in add_item_body and
             "TravelListItem.normalizedName(existingItem.itemName)" in add_item_body and
-            "existingName.caseInsensitiveCompare(normalizedName) == .orderedSame" in add_item_body and
+            "TravelListItem.duplicateKey(forNormalizedName: normalizedName)" in add_item_body and
+            "TravelListItem.duplicateKey(forNormalizedName: existingName) == duplicateKey" in add_item_body and
             "item.itemName = normalizedName" in add_item_body,
-            "TravelListTableViewController must normalize both duplicate inputs and store the canonical candidate name",
+            "TravelListTableViewController must normalize and key both duplicate inputs before storing the canonical candidate name",
             failures)
     require("travelItem = nil" in add_controller and "let textfield = textfield" in add_controller and
             "TravelListItem.normalizedName(textfield.text)" in add_controller,
@@ -364,7 +381,7 @@ def main():
     require(".PHONY: build check lint test" in makefile and
             "ROOT := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))" in makefile and
             "lint test build: check" in makefile and
-            'check:\n\tpython3 "$(ROOT)/scripts/check-baseline.py"\n\tcd "$(ROOT)" && ./build.sh' in makefile and
+            'check:\n\tpython3 "$(ROOT)/scripts/check-baseline.py"\n\tpython3 "$(ROOT)/scripts/test-check-baseline.py"\n\tcd "$(ROOT)" && ./build.sh' in makefile and
             "python3 scripts/check-baseline.py" not in makefile and
             "\n\t./build.sh" not in makefile,
             "Makefile must expose location-independent verification gates",

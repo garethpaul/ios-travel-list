@@ -6,4 +6,5 @@ lint test build: check
 
 check:
 	python3 "$(ROOT)/scripts/check-baseline.py"
+	python3 "$(ROOT)/scripts/test-check-baseline.py"
 	cd "$(ROOT)" && ./build.sh

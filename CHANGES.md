@@ -1,5 +1,13 @@
 # Changes
 
+## 2026-06-19
+
+- Collapsed accepted horizontal Unicode whitespace to ordinary spaces and used
+  a fixed-locale case- and width-insensitive duplicate key for new and existing
+  travel item names.
+- Added simulator XCTest coverage and five mutation-sensitive baseline checks
+  for the corrected canonicalization boundary.
+
 ## 2026-06-17
 
 - Rejected embedded Unicode line separators at the shared travel-item name

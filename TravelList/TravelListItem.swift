@@ -24,6 +24,14 @@ final class TravelListItem: NSObject {
             return nil
         }
 
-        return itemName
+        return itemName.components(separatedBy: .whitespaces)
+            .filter { !$0.isEmpty }
+            .joined(separator: " ")
+    }
+
+    class func duplicateKey(forNormalizedName name: String) -> String {
+        name.folding(options: [.caseInsensitive, .widthInsensitive],
+                     locale: Locale(identifier: "en_US_POSIX"))
+            .precomposedStringWithCanonicalMapping
     }
 }
