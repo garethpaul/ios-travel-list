@@ -9,7 +9,7 @@ but `TravelList.xcodeproj` has no `TravelListTests` native target. Hosted CI
 therefore compiles only the app and cannot detect compiler regressions in the
 normalization and guarded-removal tests.
 
-## Completed Scope
+## Work Completed
 
 - Add a `TravelListTests` unit-test bundle target using the checked-in test
   source and plist.
@@ -21,15 +21,25 @@ normalization and guarded-removal tests.
 - Mutation-test removal of the test target, source phase, dependency, and build
   invocation.
 
-## Verification
+## Verification Completed
 
-- `make lint`
-- `make test`
-- `make build`
-- `make check`
-- `python3 -m py_compile scripts/check-baseline.py`
-- hosted unsigned app and XCTest target compilation
-- `git diff --check`
-- Mutation results: removing the unit-test product type, test source membership,
-  app target dependency, or `build.sh` test-target invocation was rejected by
-  `scripts/check-baseline.py`.
+- Local `make check`, `make lint`, `make test`, and `make build` passed. The
+  local environment did not provide `xcodebuild`, so `build.sh` reported the
+  hosted Xcode requirement after the complete static baseline passed.
+- `python3 -m py_compile scripts/check-baseline.py`, `sh -n build.sh`, and
+  `git diff --check` passed.
+- Hostile mutations changing the plan status, inserting an unfinished-work
+  marker, falsifying a run ID, removing the unit-test product type, or removing
+  the `build.sh` test-target invocation were rejected.
+- The implementation push Check run `27395471515` completed successfully for
+  commit `6e6727a004a980f958bf039baf33c306720378df`.
+- The implementation pull-request Check run `27395475871` completed
+  successfully for commit `6e6727a004a980f958bf039baf33c306720378df` and
+  compiled the unsigned app and XCTest target on hosted macOS.
+- The post-merge push Check run `27395516880` completed successfully for
+  commit `ce8e091b3182eb82840a33e85940d0d5657685f8`.
+- The CodeQL setup run `27402323830` completed successfully for commit
+  `ce8e091b3182eb82840a33e85940d0d5657685f8`.
+- The project preserves `com.apple.product-type.bundle.unit-test`,
+  `TravelListTests.swift in Sources`, the TravelList target dependency, and
+  `-target "TravelListTests"` in `build.sh`.

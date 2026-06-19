@@ -19,10 +19,14 @@ Priority:
 - Preserve add-item and list-display behavior
 - Keep screenshot and README aligned with app behavior
 - Avoid syncing or uploading travel-list data without explicit design
-- Keep normalizer tests focused on trimmed, blank, and missing travel item names
+- Keep normalizer tests focused on trimmed, blank, missing, embedded-control,
+  Unicode line separators, and internationalized travel item names
 - Keep add-screen textfield outlet reads guarded before item creation
 - Keep table rendering guarded against stale local indexes
 - Keep item removal index handling guarded before local list mutation
+- Keep duplicate item checks case-insensitive and ahead of list mutation
+- Keep collection add-boundary normalization ahead of duplicate checks and store
+  only canonical display names
 - Keep fallback cell rendering configurable for valid rows
 - Clear stale cell state when invalid or malformed rows use fallback cells
 - Keep the travel logo scoped to each navigation item title view

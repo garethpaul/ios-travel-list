@@ -25,6 +25,13 @@ CI_PLAN = ROOT / "docs/plans/2026-06-10-ci-baseline.md"
 HOSTED_VALIDATION_PLAN = ROOT / "docs/plans/2026-06-10-hosted-project-validation.md"
 SWIFT_5_PLAN = ROOT / "docs/plans/2026-06-10-swift-5-typed-list-build.md"
 XCTEST_TARGET_PLAN = ROOT / "docs/plans/2026-06-12-xctest-target-build.md"
+DUPLICATE_ITEM_PLAN = ROOT / "docs/plans/2026-06-13-duplicate-travel-item-guard.md"
+LOCATION_INDEPENDENT_MAKE_PLAN = ROOT / "docs/plans/2026-06-13-location-independent-make.md"
+CANONICAL_ADD_BOUNDARY_PLAN = ROOT / "docs/plans/2026-06-14-canonical-travel-item-add-boundary.md"
+NORMALIZED_EXISTING_DUPLICATE_PLAN = ROOT / "docs/plans/2026-06-15-normalized-existing-duplicate-guard.md"
+CONTROL_CHARACTER_PLAN = ROOT / "docs/plans/2026-06-16-travel-item-control-character-guard.md"
+UNICODE_LINE_SEPARATOR_PLAN = ROOT / "docs/plans/2026-06-17-020-reject-unicode-line-separators-plan.md"
+UNICODE_CANONICALIZATION_PLAN = ROOT / "docs/plans/2026-06-19-unicode-travel-item-canonicalization.md"
 PNG_SIGNATURE = b"\x89PNG\r\n\x1a\n"
 
 
@@ -35,6 +42,14 @@ def require(condition, message, failures):
 
 def read(relative_path):
     return (ROOT / relative_path).read_text(encoding="utf-8", errors="replace")
+
+
+def markdown_section(text, heading):
+    match = re.search(
+        rf"(?ms)^## {re.escape(heading)}\s*$\n(.*?)(?=^## |\Z)",
+        text,
+    )
+    return match.group(1).strip() if match else ""
 
 
 def strip_swift_line_comments(text):
@@ -117,6 +132,13 @@ def main():
         "docs/plans/2026-06-10-hosted-project-validation.md",
         "docs/plans/2026-06-10-swift-5-typed-list-build.md",
         "docs/plans/2026-06-12-xctest-target-build.md",
+        "docs/plans/2026-06-13-duplicate-travel-item-guard.md",
+        "docs/plans/2026-06-13-location-independent-make.md",
+        "docs/plans/2026-06-14-canonical-travel-item-add-boundary.md",
+        "docs/plans/2026-06-15-normalized-existing-duplicate-guard.md",
+        "docs/plans/2026-06-16-travel-item-control-character-guard.md",
+        "docs/plans/2026-06-17-020-reject-unicode-line-separators-plan.md",
+        "docs/plans/2026-06-19-unicode-travel-item-canonicalization.md",
         "docs/readme-overview.svg",
     ]
 
@@ -172,6 +194,12 @@ def main():
     hosted_validation_plan = HOSTED_VALIDATION_PLAN.read_text(encoding="utf-8") if HOSTED_VALIDATION_PLAN.exists() else ""
     swift_5_plan = SWIFT_5_PLAN.read_text(encoding="utf-8") if SWIFT_5_PLAN.exists() else ""
     xctest_target_plan = XCTEST_TARGET_PLAN.read_text(encoding="utf-8") if XCTEST_TARGET_PLAN.exists() else ""
+    duplicate_item_plan = DUPLICATE_ITEM_PLAN.read_text(encoding="utf-8") if DUPLICATE_ITEM_PLAN.exists() else ""
+    location_independent_make_plan = LOCATION_INDEPENDENT_MAKE_PLAN.read_text(encoding="utf-8") if LOCATION_INDEPENDENT_MAKE_PLAN.exists() else ""
+    canonical_add_boundary_plan = CANONICAL_ADD_BOUNDARY_PLAN.read_text(encoding="utf-8") if CANONICAL_ADD_BOUNDARY_PLAN.exists() else ""
+    normalized_existing_duplicate_plan = NORMALIZED_EXISTING_DUPLICATE_PLAN.read_text(encoding="utf-8") if NORMALIZED_EXISTING_DUPLICATE_PLAN.exists() else ""
+    control_character_plan = CONTROL_CHARACTER_PLAN.read_text(encoding="utf-8") if CONTROL_CHARACTER_PLAN.exists() else ""
+    unicode_line_separator_plan = UNICODE_LINE_SEPARATOR_PLAN.read_text(encoding="utf-8") if UNICODE_LINE_SEPARATOR_PLAN.exists() else ""
     workflow = read(".github/workflows/check.yml")
 
     require(app_plist.get("CFBundleIdentifier", "").startswith("com.garethpaul."),
@@ -217,16 +245,78 @@ def main():
                 failures)
     require("class func normalizedName(_ name: String?) -> String?" in item_model and
             "trimmingCharacters(in: .whitespacesAndNewlines)" in item_model and
-            "itemName.isEmpty" in item_model and "return nil" in item_model,
-            "TravelListItem must expose a shared optional name normalizer",
+            "itemName.isEmpty" in item_model and
+            "itemName.rangeOfCharacter(from: .controlCharacters) == nil" in item_model and
+            "itemName.rangeOfCharacter(from: .newlines) == nil" in item_model and
+            "components(separatedBy: .whitespaces)" in item_model and
+            ".filter { !$0.isEmpty }" in item_model and
+            '.joined(separator: " ")' in item_model and
+            item_model.count("return nil") >= 3,
+            "TravelListItem must expose a shared optional name normalizer with control, newline, and horizontal-whitespace boundaries",
+            failures)
+    require("class func duplicateKey(forNormalizedName name: String) -> String" in item_model and
+            "options: [.caseInsensitive, .widthInsensitive]" in item_model and
+            'Locale(identifier: "en_US_POSIX")' in item_model and
+            ".precomposedStringWithCanonicalMapping" in item_model,
+            "TravelListItem must expose a stable locale-independent case and width duplicate key",
             failures)
     require("testTravelItemNameNormalizationTrimsWhitespace" in tests and
             "testTravelItemNameNormalizationRejectsBlankNames" in tests and
+            "testTravelItemNameNormalizationRejectsEmbeddedControlCharacters" in tests and
+            "testTravelItemNameNormalizationRejectsUnicodeLineSeparators" in tests and
+            "testTravelItemNameNormalizationCollapsesUnicodeHorizontalWhitespace" in tests and
+            "testTravelItemNameNormalizationPreservesInternationalizedNames" in tests and
+            'TravelListItem.normalizedName("Pass\\nport")' in tests and
+            'TravelListItem.normalizedName("Pass\\tport")' in tests and
+            'TravelListItem.normalizedName("Pass\\u{0}port")' in tests and
+            'TravelListItem.normalizedName("Pass\\u{2028}port")' in tests and
+            'TravelListItem.normalizedName("Pass\\u{2029}port")' in tests and
+            'XCTAssertEqual(TravelListItem.normalizedName("  Café Guide  "), "Café Guide")' in tests and
             "testRemoveTravelItemAtIndexRemovesValidItem" in tests and
             "testRemoveTravelItemAtIndexRejectsInvalidIndexes" in tests and
+            "testAddTravelItemAppendsUniqueItem" in tests and
+            "testAddTravelItemRejectsCaseInsensitiveDuplicates" in tests and
+            "testAddTravelItemRejectsDuplicateOfNoncanonicalExistingItem" in tests and
+            "testAddTravelItemRejectsWidthVariantDuplicate" in tests and
+            "testAddTravelItemRejectsUnicodeWhitespaceVariantDuplicate" in tests and
+            "testAddTravelItemRejectsBlankDirectCaller" in tests and
+            'XCTAssertEqual(controller.travelItems.first?.itemName, "Passport")' in tests and
+            'TravelListItem(name: "  PASSPORT\\n")' in tests and
+            'let existingItem = TravelListItem(name: "  Passport\\n")' in tests and
+            'XCTAssertEqual(existingItem.itemName, "  Passport\\n")' in tests and
             "XCTAssertEqual" in tests and "XCTAssertNil" in tests and
             "XCTAssert(true" not in tests and "testPerformanceExample" not in tests,
             "TravelListTests must replace template tests with travel item normalization and removal assertions",
+            failures)
+    add_item_index = table_controller.find("func addTravelItem(_ item: TravelListItem) -> Bool")
+    next_table_method_index = table_controller.find("override func tableView", add_item_index)
+    add_item_body = table_controller[add_item_index:next_table_method_index]
+    add_normalizer_index = add_item_body.find("guard let normalizedName = TravelListItem.normalizedName(item.itemName)")
+    add_duplicate_key_index = add_item_body.find("let duplicateKey = TravelListItem.duplicateKey(forNormalizedName: normalizedName)")
+    add_duplicate_index = add_item_body.find("travelItems.contains(where:")
+    add_canonical_assignment_index = add_item_body.find("item.itemName = normalizedName")
+    add_append_index = add_item_body.find("travelItems.append(item)")
+    unwind_start = table_controller.find("@IBAction func unwindToList")
+    unwind_end = table_controller.find("override func viewDidLoad", unwind_start)
+    unwind_body = table_controller[unwind_start:unwind_end]
+    require(add_item_index != -1 and next_table_method_index != -1 and
+            add_normalizer_index != -1 and
+            add_duplicate_key_index != -1 and
+            "travelItems.contains(where:" in add_item_body and
+            "TravelListItem.duplicateKey(forNormalizedName: existingName) == duplicateKey" in add_item_body and
+            "return false" in add_item_body and
+            add_normalizer_index < add_duplicate_key_index < add_duplicate_index < add_canonical_assignment_index < add_append_index and
+            add_item_body.find("return false") < add_append_index < add_item_body.find("return true") and
+            "if addTravelItem(item)" in unwind_body and
+            unwind_body.find("if addTravelItem(item)") < unwind_body.find("tableView.reloadData()"),
+            "TravelListTableViewController must reject canonical duplicates before append and reload only on success",
+            failures)
+    require("TravelListItem.normalizedName(item.itemName)" in add_item_body and
+            "TravelListItem.normalizedName(existingItem.itemName)" in add_item_body and
+            "TravelListItem.duplicateKey(forNormalizedName: normalizedName)" in add_item_body and
+            "TravelListItem.duplicateKey(forNormalizedName: existingName) == duplicateKey" in add_item_body and
+            "item.itemName = normalizedName" in add_item_body,
+            "TravelListTableViewController must normalize and key both duplicate inputs before storing the canonical candidate name",
             failures)
     require("travelItem = nil" in add_controller and "let textfield = textfield" in add_controller and
             "TravelListItem.normalizedName(textfield.text)" in add_controller,
@@ -288,9 +378,13 @@ def main():
     require(len(swift_files) >= 6,
             "expected Swift source/test inventory is missing",
             failures)
-    require(".PHONY: build check lint test" in makefile and "lint test build: check" in makefile and
-            "check:\n\tpython3 scripts/check-baseline.py\n\t./build.sh" in makefile,
-            "Makefile must expose lint, test, build, and check verification gates",
+    require(".PHONY: build check lint test" in makefile and
+            "ROOT := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))" in makefile and
+            "lint test build: check" in makefile and
+            'check:\n\tpython3 "$(ROOT)/scripts/check-baseline.py"\n\tpython3 "$(ROOT)/scripts/test-check-baseline.py"\n\tcd "$(ROOT)" && ./build.sh' in makefile and
+            "python3 scripts/check-baseline.py" not in makefile and
+            "\n\t./build.sh" not in makefile,
+            "Makefile must expose location-independent verification gates",
             failures)
     shell_result = subprocess.run(["sh", "-n", "build.sh"], cwd=str(ROOT), text=True,
                                   stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -314,9 +408,17 @@ def main():
     require("normalizer tests" in readme.lower(),
             "README must document travel item normalizer tests",
             failures)
+    require("embedded control-character guard" in readme.lower(),
+            "README must document the embedded control-character boundary",
+            failures)
+    require("unicode line separators" in readme.lower(),
+            "README must document the Unicode newline boundary",
+            failures)
     require("removal index" in readme.lower(),
             "README must document travel item removal index guardrails",
             failures)
+    require("duplicate item checks" in readme.lower(),
+            "README must document duplicate item guardrails", failures)
     require("scripts/check-baseline.py" in vision and "make lint" in vision and "make test" in vision and
             "make build" in vision and "GitHub Actions" in vision and "local-first" in vision.lower() and
             "fallback cell" in vision.lower() and "stale cell" in vision.lower() and
@@ -326,14 +428,28 @@ def main():
     require("normalizer tests" in vision.lower(),
             "VISION must describe travel item normalizer tests",
             failures)
+    require("embedded-control" in vision.lower() and "internationalized" in vision.lower(),
+            "VISION must preserve control-character rejection and internationalized-name coverage",
+            failures)
+    require("unicode line separators" in vision.lower(),
+            "VISION must preserve Unicode newline rejection",
+            failures)
     require("removal index" in vision.lower(),
             "VISION must describe travel item removal index guardrails",
             failures)
+    require("duplicate item checks" in vision.lower(),
+            "VISION must describe duplicate item guardrails", failures)
     require("travel lists" in security.lower() and "make check" in security and "GitHub Actions" in security and "stale cell" in security.lower() and
             "name normalizer" in security.lower() and "normalizer tests" in security.lower() and
             "textfield outlet" in security.lower() and "removal index" in security.lower() and "title view" in security.lower(),
             "SECURITY must document travel-list privacy and the static baseline",
             failures)
+    require("duplicate item checks" in security.lower(),
+            "SECURITY must document duplicate item guardrails", failures)
+    require("embedded control-character rejection" in security.lower(),
+            "SECURITY must document the control-character boundary", failures)
+    require("unicode line separators" in security.lower(),
+            "SECURITY must document the Unicode newline boundary", failures)
     require("GitHub Actions" in changes and "whitespace-only" in changes and "hex color" in changes and "cell rendering" in changes and
             "fallback cell" in changes.lower() and "stale cell" in changes.lower() and "title view" in changes.lower() and
             "index" in changes.lower() and "textfield outlet" in changes.lower() and "name normalizer" in changes.lower() and "make check" in changes,
@@ -347,6 +463,21 @@ def main():
             failures)
     require("removal index" in changes.lower(),
             "CHANGES must record travel item removal index updates",
+            failures)
+    require("duplicate item checks" in changes.lower(),
+            "CHANGES must record duplicate item updates", failures)
+    require("embedded control characters" in changes.lower() and
+            "internationalized display names" in changes.lower(),
+            "CHANGES must record the control-character boundary", failures)
+    require("unicode line separators" in changes.lower(),
+            "CHANGES must record the Unicode newline boundary", failures)
+    require("title: Unicode Line Separator Guard" in unicode_line_separator_plan and
+            "type: fix" in unicode_line_separator_plan and
+            "date: 2026-06-17" in unicode_line_separator_plan and
+            "R1." in unicode_line_separator_plan and "R6." in unicode_line_separator_plan and
+            "CharacterSet.newlines" in unicode_line_separator_plan and
+            re.search(r"(?mi)^status:\s*", unicode_line_separator_plan) is None,
+            "Unicode line separator plan must preserve modern metadata and requirements without a legacy status field",
             failures)
     require("status: completed" in baseline_plan and "status: completed" in cell_index_plan and
             "status: completed" in cell_fallback_plan and "status: completed" in cell_reset_plan,
@@ -377,8 +508,117 @@ def main():
             "hosted validation plan must be completed", failures)
     require("status: completed" in swift_5_plan and "XCTest source" in swift_5_plan,
             "Swift 5 typed-list plan must be completed and document the original test-target boundary", failures)
-    require("status: completed" in xctest_target_plan and "mutation" in xctest_target_plan.lower(),
-            "XCTest target build plan must record completed mutation verification", failures)
+    require("status: completed" in duplicate_item_plan and
+            "All four Make gates" in duplicate_item_plan and
+            "hostile mutations" in duplicate_item_plan.lower(),
+            "duplicate travel item plan must record completed status and verification", failures)
+    canonical_add_statuses = re.findall(
+        r"^status: .+$", canonical_add_boundary_plan, flags=re.MULTILINE
+    )
+    canonical_add_verification = markdown_section(
+        canonical_add_boundary_plan, "Verification Completed"
+    )
+    require(canonical_add_statuses == ["status: completed"] and
+            "All four Make gates" in canonical_add_verification and
+            "absolute Makefile path" in canonical_add_verification and
+            "Six isolated hostile mutations" in canonical_add_verification and
+            "git diff --check" in canonical_add_verification and
+            "`xcodebuild` was unavailable" in canonical_add_verification and
+            re.search(r"\b(?:pending|todo|tbd|not run)\b",
+                      canonical_add_verification,
+                      re.IGNORECASE) is None,
+            "canonical travel-item add plan must record completed status and actual local verification",
+            failures)
+    normalized_existing_statuses = re.findall(
+        r"^status: .+$", normalized_existing_duplicate_plan, flags=re.MULTILINE
+    )
+    normalized_existing_verification = markdown_section(
+        normalized_existing_duplicate_plan, "Verification Completed"
+    )
+    require(normalized_existing_statuses == ["status: completed"] and
+            "All four Make gates" in normalized_existing_verification and
+            "absolute Makefile path" in normalized_existing_verification and
+            "Five isolated hostile mutations" in normalized_existing_verification and
+            "git diff --check" in normalized_existing_verification and
+            "`xcodebuild` was unavailable" in normalized_existing_verification and
+            re.search(r"\b(?:pending|todo|tbd|not run)\b",
+                      normalized_existing_verification,
+                      re.IGNORECASE) is None,
+            "normalized existing duplicate plan must record completed status and actual local verification",
+            failures)
+    control_character_statuses = re.findall(
+        r"^status: .+$", control_character_plan, flags=re.MULTILINE
+    )
+    control_character_verification = markdown_section(
+        control_character_plan, "Verification Completed"
+    )
+    require(control_character_statuses == ["status: completed"] and
+            "All four Make gates" in control_character_verification and
+            "absolute Makefile path" in control_character_verification and
+            "Six isolated hostile mutations" in control_character_verification and
+            "git diff --check" in control_character_verification and
+            "`xcodebuild`" in control_character_verification and
+            re.search(r"\b(?:pending|todo|tbd|not run)\b",
+                      control_character_verification,
+                      re.IGNORECASE) is None,
+            "travel item control-character plan must record completed status and actual local verification",
+            failures)
+    location_make_statuses = re.findall(
+        r"^status: .+$", location_independent_make_plan, flags=re.MULTILINE
+    )
+    location_make_verification = markdown_section(
+        location_independent_make_plan, "Verification Completed"
+    )
+    require(location_make_statuses == ["status: completed"] and
+            "All four Make gates passed from the checkout" in location_make_verification and
+            "All four Make gates passed from `/tmp` through the absolute Makefile path" in location_make_verification and
+            "python3 -m py_compile scripts/check-baseline.py" in location_make_verification and
+            "sh -n build.sh" in location_make_verification and
+            "project metadata parsing" in location_make_verification and
+            "git diff --check" in location_make_verification and
+            "`xcodebuild` was unavailable" in location_make_verification and
+            "Six isolated hostile mutations were rejected" in location_make_verification and
+            re.search(r"\b(?:pending|todo|tbd|not run)\b",
+                      location_make_verification,
+                      re.IGNORECASE) is None,
+            "location-independent Make plan must record completed status and actual local verification", failures)
+    require("absolute makefile path" in readme.lower() and
+            "location-independent" in changes.lower(),
+            "README and CHANGES must document location-independent Make verification", failures)
+    xctest_target_status = re.findall(r"(?mi)^status:\s*(.+?)\s*$", xctest_target_plan)
+    xctest_target_work = markdown_section(xctest_target_plan, "Work Completed")
+    xctest_target_verification = markdown_section(
+        xctest_target_plan, "Verification Completed"
+    )
+    require(xctest_target_status == ["completed"] and xctest_target_work,
+            "XCTest target build plan must record one completed status and completed work",
+            failures)
+    require(xctest_target_verification and
+            not re.search(r"(?i)\b(?:pending|todo|tbd|not run)\b", xctest_target_verification),
+            "XCTest target build plan must record finished verification without pending markers",
+            failures)
+    for evidence in [
+        "make check",
+        "make lint",
+        "make test",
+        "make build",
+        "python3 -m py_compile scripts/check-baseline.py",
+        "sh -n build.sh",
+        "git diff --check",
+        "27395471515",
+        "27395475871",
+        "27395516880",
+        "27402323830",
+        "6e6727a004a980f958bf039baf33c306720378df",
+        "ce8e091b3182eb82840a33e85940d0d5657685f8",
+        "com.apple.product-type.bundle.unit-test",
+        "TravelListTests.swift in Sources",
+        "TravelList target dependency",
+        '-target "TravelListTests"',
+    ]:
+        require(evidence in xctest_target_verification,
+                f"XCTest target build plan must preserve verification evidence: {evidence}",
+                failures)
     checkout_step = re.search(
         r"(?m)^      - name: Check out repository\n"
         r"        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6\.0\.3\n"

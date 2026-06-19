@@ -55,12 +55,15 @@ The checked-in project has no external dependency manifest. Use Xcode for full b
 - Run `./build.sh` to compile the unsigned Swift 5 app for the simulator when
   Xcode is installed.
 - The sample is local-first and keeps list items in memory.
-- New item names go through a shared name normalizer before creation, and whitespace-only entries are ignored.
+- New item names go through a shared name normalizer at both UI creation and the collection add boundary; whitespace-only entries are ignored and accepted Unicode horizontal whitespace runs are stored as one ordinary space.
 - Add-screen textfield outlet reads fall back through the same normalizer when the outlet is unavailable.
-- Focused normalizer tests cover trimmed, blank, and missing travel item names.
+- Focused normalizer tests cover trimmed, blank, missing, control-character,
+  Unicode line separator, and horizontal Unicode whitespace travel item names.
 - Cell rendering uses a fallback cell that can still display an item if storyboard reuse wiring is unavailable.
 - Invalid or malformed rows clear stale cell text and accessory state before the fallback cell is returned.
 - Item removal index checks reject stale or invalid row selections before mutating the local list.
+- Duplicate item checks use a fixed-locale case- and width-insensitive key for
+  both new and existing names before appending or reloading the table.
 - The travel logo is scoped to each navigation item title view instead of being
   added as a navigation-controller overlay.
 
@@ -75,7 +78,7 @@ make build
 make check
 ```
 
-Each Make gate runs `scripts/check-baseline.py`, parses plist/storyboard/asset metadata, checks image resources and Xcode wiring, verifies typed travel-item storage, the shared name normalizer, guarded textfield outlet reads, normalizer tests, navigation logo title view ownership, fallback cell reset, table/removal index guards, invalid color fallback, and side-effect-free cell rendering, and guards against logging, network, upload, analytics, or persistence behavior. When Xcode is available the same gate compiles the unsigned app and XCTest target; otherwise the build step skips cleanly.
+Each Make gate runs `scripts/check-baseline.py` plus five hostile canonicalization mutations, parses plist/storyboard/asset metadata, checks image resources and Xcode wiring, verifies typed travel-item storage, the shared name normalizer and its embedded control-character guard, rejects Unicode line separators, canonicalizes horizontal Unicode whitespace, checks the fixed-locale case/width duplicate key, guarded textfield outlet reads, focused XCTest source, navigation logo title view ownership, fallback cell reset, table/removal index guards, invalid color fallback, and side-effect-free cell rendering, and guards against logging, network, upload, analytics, or persistence behavior. When Xcode is available the same gate compiles the unsigned app and XCTest target; otherwise the build step skips cleanly.
 
 Pinned `macos-15` GitHub Actions runs `make check` and compiles the unsigned
 Swift 5 app and XCTest target. This hosted validation does not inspect travel-item data,
@@ -108,6 +111,14 @@ When the required SDK or runtime is unavailable, use static checks and source re
 - See `docs/plans/2026-06-09-travel-item-name-normalizer.md` for the shared name normalizer guardrail.
 - See `docs/plans/2026-06-09-travel-item-normalizer-tests.md` for the normalizer tests guardrail.
 - See `docs/plans/2026-06-09-travel-item-removal-index-guard.md` for the removal index guardrail.
+- See `docs/plans/2026-06-13-duplicate-travel-item-guard.md` for the duplicate
+  item guardrail.
+- See `docs/plans/2026-06-14-canonical-travel-item-add-boundary.md` for direct
+  caller normalization at the collection mutation boundary.
+- See `docs/plans/2026-06-16-travel-item-control-character-guard.md` for the
+  embedded control-character boundary.
+- See `docs/plans/2026-06-17-020-reject-unicode-line-separators-plan.md` for the
+  Unicode line separator boundary.
 - See `docs/plans/2026-06-09-navigation-logo-title-view.md` for the navigation logo title view guardrail.
 - See `docs/plans/2026-06-10-add-textfield-outlet-guard.md` for the textfield outlet guardrail.
 - See `docs/plans/2026-06-09-make-gate-aliases.md` for the local gate alias guardrail.
@@ -118,6 +129,8 @@ When the required SDK or runtime is unavailable, use static checks and source re
 - See `docs/plans/2026-06-10-swift-5-typed-list-build.md` for the Swift 5 typed
   list migration and current XCTest target limitation.
 - Run `make lint`, `make test`, `make build`, and `make check` before pushing changes to Swift sources, plist/storyboard files, image assets, Xcode metadata, list flow, or privacy documentation.
+- The same gates may be invoked through an absolute Makefile path from another
+  directory; verification resolves both commands relative to the checkout.
 
 ## Contributing
 

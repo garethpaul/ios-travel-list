@@ -9,8 +9,9 @@ class TravelListTableViewController: UITableViewController {
             return
         }
 
-        travelItems.append(item)
-        tableView.reloadData()
+        if addTravelItem(item) {
+            tableView.reloadData()
+        }
     }
 
     override func viewDidLoad() {
@@ -72,6 +73,27 @@ class TravelListTableViewController: UITableViewController {
         }
 
         travelItems.remove(at: index)
+        return true
+    }
+
+    func addTravelItem(_ item: TravelListItem) -> Bool {
+        guard let normalizedName = TravelListItem.normalizedName(item.itemName) else {
+            return false
+        }
+        let duplicateKey = TravelListItem.duplicateKey(forNormalizedName: normalizedName)
+
+        guard !travelItems.contains(where: { existingItem in
+            guard let existingName = TravelListItem.normalizedName(existingItem.itemName) else {
+                return false
+            }
+
+            return TravelListItem.duplicateKey(forNormalizedName: existingName) == duplicateKey
+        }) else {
+            return false
+        }
+
+        item.itemName = normalizedName
+        travelItems.append(item)
         return true
     }
 

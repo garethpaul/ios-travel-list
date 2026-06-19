@@ -16,6 +16,22 @@ final class TravelListItem: NSObject {
             return nil
         }
 
-        return itemName
+        guard itemName.rangeOfCharacter(from: .controlCharacters) == nil else {
+            return nil
+        }
+
+        guard itemName.rangeOfCharacter(from: .newlines) == nil else {
+            return nil
+        }
+
+        return itemName.components(separatedBy: .whitespaces)
+            .filter { !$0.isEmpty }
+            .joined(separator: " ")
+    }
+
+    class func duplicateKey(forNormalizedName name: String) -> String {
+        name.folding(options: [.caseInsensitive, .widthInsensitive],
+                     locale: Locale(identifier: "en_US_POSIX"))
+            .precomposedStringWithCanonicalMapping
     }
 }

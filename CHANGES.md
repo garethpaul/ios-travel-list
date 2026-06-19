@@ -1,5 +1,40 @@
 # Changes
 
+## 2026-06-19
+
+- Collapsed accepted horizontal Unicode whitespace to ordinary spaces and used
+  a fixed-locale case- and width-insensitive duplicate key for new and existing
+  travel item names.
+- Added simulator XCTest coverage and five mutation-sensitive baseline checks
+  for the corrected canonicalization boundary.
+
+## 2026-06-17
+
+- Rejected embedded Unicode line separators at the shared travel-item name
+  boundary and added focused XCTest coverage.
+
+## 2026-06-16
+
+- Rejected embedded control characters at the shared travel-item name boundary
+  while preserving ordinary internationalized display names.
+
+## 2026-06-15
+
+- Normalized existing item names during duplicate checks so legacy or direct
+  noncanonical rows cannot admit an equivalent canonical item.
+
+## 2026-06-14
+
+- Canonicalized direct travel-item additions before duplicate comparison and
+  rejected blank names at the collection mutation boundary.
+
+## 2026-06-13
+
+- Made all Make verification aliases location-independent when invoked through
+  an absolute Makefile path.
+- Added case-insensitive duplicate item checks before user-added list mutation
+  and table reload.
+
 ## 2026-06-12
 
 - Added an app-hosted `TravelListTests` target and made `make check` compile the

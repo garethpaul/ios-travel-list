@@ -17,6 +17,25 @@ final class MyAppTests: XCTestCase {
         XCTAssertNil(TravelListItem.normalizedName(nil), "Missing travel item names should be ignored")
     }
 
+    func testTravelItemNameNormalizationRejectsEmbeddedControlCharacters() {
+        XCTAssertNil(TravelListItem.normalizedName("Pass\nport"))
+        XCTAssertNil(TravelListItem.normalizedName("Pass\tport"))
+        XCTAssertNil(TravelListItem.normalizedName("Pass\u{0}port"))
+    }
+
+    func testTravelItemNameNormalizationRejectsUnicodeLineSeparators() {
+        XCTAssertNil(TravelListItem.normalizedName("Pass\u{2028}port"))
+        XCTAssertNil(TravelListItem.normalizedName("Pass\u{2029}port"))
+    }
+
+    func testTravelItemNameNormalizationCollapsesUnicodeHorizontalWhitespace() {
+        XCTAssertEqual(TravelListItem.normalizedName("Travel\u{00A0}\u{2007} Guide"), "Travel Guide")
+    }
+
+    func testTravelItemNameNormalizationPreservesInternationalizedNames() {
+        XCTAssertEqual(TravelListItem.normalizedName("  Café Guide  "), "Café Guide")
+    }
+
     func testRemoveTravelItemAtIndexRemovesValidItem() {
         let controller = TravelListTableViewController()
         controller.travelItems.append(TravelListItem(name: "Passport"))
@@ -32,6 +51,57 @@ final class MyAppTests: XCTestCase {
         XCTAssertFalse(controller.removeTravelItem(at: -1), "Negative travel item indexes should not be removed")
         XCTAssertFalse(controller.removeTravelItem(at: 1), "Out-of-range travel item indexes should not be removed")
         XCTAssertEqual(controller.travelItems.count, 1, "Invalid item removal should leave the local list unchanged")
+    }
+
+    func testAddTravelItemAppendsUniqueItem() {
+        let controller = TravelListTableViewController()
+
+        XCTAssertTrue(controller.addTravelItem(TravelListItem(name: "  Passport\n")))
+        XCTAssertEqual(controller.travelItems.count, 1)
+        XCTAssertEqual(controller.travelItems.first?.itemName, "Passport")
+    }
+
+    func testAddTravelItemRejectsCaseInsensitiveDuplicates() {
+        let controller = TravelListTableViewController()
+        controller.travelItems.append(TravelListItem(name: "Passport"))
+
+        XCTAssertFalse(controller.addTravelItem(TravelListItem(name: "Passport")))
+        XCTAssertFalse(controller.addTravelItem(TravelListItem(name: "passport")))
+        XCTAssertFalse(controller.addTravelItem(TravelListItem(name: "  PASSPORT\n")))
+        XCTAssertEqual(controller.travelItems.count, 1)
+    }
+
+    func testAddTravelItemRejectsDuplicateOfNoncanonicalExistingItem() {
+        let controller = TravelListTableViewController()
+        let existingItem = TravelListItem(name: "  Passport\n")
+        controller.travelItems.append(existingItem)
+
+        XCTAssertFalse(controller.addTravelItem(TravelListItem(name: "passport")))
+        XCTAssertEqual(controller.travelItems.count, 1)
+        XCTAssertEqual(existingItem.itemName, "  Passport\n")
+    }
+
+    func testAddTravelItemRejectsWidthVariantDuplicate() {
+        let controller = TravelListTableViewController()
+        controller.travelItems.append(TravelListItem(name: "Passport"))
+
+        XCTAssertFalse(controller.addTravelItem(TravelListItem(name: "Ｐａｓｓｐｏｒｔ")))
+        XCTAssertEqual(controller.travelItems.count, 1)
+    }
+
+    func testAddTravelItemRejectsUnicodeWhitespaceVariantDuplicate() {
+        let controller = TravelListTableViewController()
+        controller.travelItems.append(TravelListItem(name: "Travel Guide"))
+
+        XCTAssertFalse(controller.addTravelItem(TravelListItem(name: "Travel\u{00A0}\u{2007}Guide")))
+        XCTAssertEqual(controller.travelItems.count, 1)
+    }
+
+    func testAddTravelItemRejectsBlankDirectCaller() {
+        let controller = TravelListTableViewController()
+
+        XCTAssertFalse(controller.addTravelItem(TravelListItem(name: "  \n\t  ")))
+        XCTAssertTrue(controller.travelItems.isEmpty)
     }
 
 }
