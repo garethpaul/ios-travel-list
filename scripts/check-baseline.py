@@ -379,7 +379,7 @@ def main():
             "expected Swift source/test inventory is missing",
             failures)
     require(".PHONY: build check lint test" in makefile and
-            "ROOT := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))" in makefile and
+            "override ROOT := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))" in makefile and
             "lint test build: check" in makefile and
             'check:\n\tpython3 "$(ROOT)/scripts/check-baseline.py"\n\tpython3 "$(ROOT)/scripts/test-check-baseline.py"\n\tcd "$(ROOT)" && ./build.sh' in makefile and
             "python3 scripts/check-baseline.py" not in makefile and
