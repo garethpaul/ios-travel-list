@@ -40,6 +40,24 @@ MUTATIONS = [
         "testAddTravelItemRejectsWidthVariantDuplicate",
         "testAddTravelItemAllowsWidthVariantDuplicate",
     ),
+    (
+        "mismatch release XCTest bundle identifier",
+        "TravelList.xcodeproj/project.pbxproj",
+        "\t\t\t\tPRODUCT_BUNDLE_IDENTIFIER = com.garethpaul.TravelListTests;\n"
+        '\t\t\t\tPRODUCT_NAME = "$(TARGET_NAME)";\n'
+        "\t\t\t\tSWIFT_VERSION = 5.0;\n"
+        "\t\t\t\tTARGETED_DEVICE_FAMILY = 1;\n"
+        '\t\t\t\tTEST_HOST = "$(BUILT_PRODUCTS_DIR)/TravelList.app/TravelList";\n'
+        "\t\t\t};\n"
+        "\t\t\tname = Release;",
+        "\t\t\t\tPRODUCT_BUNDLE_IDENTIFIER = com.garethpaul.WrongTests;\n"
+        '\t\t\t\tPRODUCT_NAME = "$(TARGET_NAME)";\n'
+        "\t\t\t\tSWIFT_VERSION = 5.0;\n"
+        "\t\t\t\tTARGETED_DEVICE_FAMILY = 1;\n"
+        '\t\t\t\tTEST_HOST = "$(BUILT_PRODUCTS_DIR)/TravelList.app/TravelList";\n'
+        "\t\t\t};\n"
+        "\t\t\tname = Release;",
+    ),
 ]
 
 
@@ -81,7 +99,7 @@ def main():
                 print(f"baseline accepted hostile mutation: {description}", file=sys.stderr)
                 return 1
 
-    print(f"Rejected {len(MUTATIONS)} Unicode canonicalization mutations.")
+    print(f"Rejected {len(MUTATIONS)} static contract mutations.")
     return 0
 
 

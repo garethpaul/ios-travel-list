@@ -91,6 +91,19 @@ def check_png(relative_path, failures):
         failures.append(f"{relative_path} could not be read: {error}")
 
 
+def build_configuration_settings(project, configuration_id):
+    configuration_start = project.find(f"{configuration_id} /* ")
+    if configuration_start < 0:
+        return ""
+    settings_start = project.find("buildSettings = {", configuration_start)
+    if settings_start < 0:
+        return ""
+    settings_end = project.find("\n\t\t\t};", settings_start)
+    if settings_end < 0:
+        return ""
+    return project[settings_start:settings_end]
+
+
 def main():
     failures = []
     required_files = [
@@ -213,6 +226,19 @@ def main():
             'INFOPLIST_FILE = "$(SRCROOT)/TravelList/Info.plist";' in project,
             "Xcode project must use Swift 5 and iOS 12 while preserving Info.plist wiring",
             failures)
+    expected_bundle_identifiers = {
+        "79C5975E19418A280085192D": "com.garethpaul.TravelList",
+        "79C5975F19418A280085192D": "com.garethpaul.TravelList",
+        "A10000000000000000000009": "com.garethpaul.TravelListTests",
+        "A1000000000000000000000A": "com.garethpaul.TravelListTests",
+    }
+    for configuration_id, bundle_identifier in expected_bundle_identifiers.items():
+        settings = build_configuration_settings(project, configuration_id)
+        require(
+            f"PRODUCT_BUNDLE_IDENTIFIER = {bundle_identifier};" in settings,
+            f"Xcode target configuration {configuration_id} must set {bundle_identifier}",
+            failures,
+        )
     require('name = TravelListTests;' in project and
             'productType = "com.apple.product-type.bundle.unit-test";' in project and
             project.count('TravelListTests.swift in Sources') == 2 and

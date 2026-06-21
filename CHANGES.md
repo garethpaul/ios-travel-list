@@ -1,5 +1,10 @@
 # Changes
 
+## 2026-06-21
+
+- Aligned target-local app and XCTest bundle identifiers with their existing
+  Info.plist identifiers and added a static mismatch regression contract.
+
 ## 2026-06-19
 
 - Collapsed accepted horizontal Unicode whitespace to ordinary spaces and used
