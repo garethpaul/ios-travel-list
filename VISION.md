@@ -27,6 +27,8 @@ Priority:
 - Keep duplicate item checks case-insensitive and ahead of list mutation
 - Keep collection add-boundary normalization ahead of duplicate checks and store
   only canonical display names
+- Keep initial sample data one-shot per controller so lifecycle callbacks do not
+  duplicate or restore list rows
 - Keep fallback cell rendering configurable for valid rows
 - Clear stale cell state when invalid or malformed rows use fallback cells
 - Keep the travel logo scoped to each navigation item title view

@@ -2,6 +2,7 @@ import UIKit
 
 class TravelListTableViewController: UITableViewController {
     var travelItems: [TravelListItem] = []
+    private var didLoadInitialData = false
 
     @IBAction func unwindToList(_ segue: UIStoryboardSegue) {
         guard let source = segue.source as? AddTravelViewController,
@@ -28,6 +29,11 @@ class TravelListTableViewController: UITableViewController {
     }
 
     func loadInitialData() {
+        guard !didLoadInitialData else {
+            return
+        }
+        didLoadInitialData = true
+
         travelItems.append(TravelListItem(name: "Phone"))
         travelItems.append(TravelListItem(name: "Wallet"))
         travelItems.append(TravelListItem(name: "Passport"))

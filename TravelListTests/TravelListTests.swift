@@ -8,6 +8,15 @@ import XCTest
 
 final class MyAppTests: XCTestCase {
 
+    func testLoadInitialDataSeedsDefaultsOnlyOnce() {
+        let controller = TravelListTableViewController()
+
+        controller.loadInitialData()
+        controller.loadInitialData()
+
+        XCTAssertEqual(controller.travelItems.map { $0.itemName }, ["Phone", "Wallet", "Passport"])
+    }
+
     func testTravelItemNameNormalizationTrimsWhitespace() {
         XCTAssertEqual(TravelListItem.normalizedName("  Passport\n"), "Passport", "Travel item names should be trimmed before saving")
     }

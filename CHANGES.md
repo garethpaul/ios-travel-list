@@ -1,5 +1,43 @@
 # Changes
 
+## 2026-06-25 04:54 - P2 - Make sample seeding idempotent
+
+### Summary
+Made initial Phone, Wallet, and Passport seeding one-shot per table controller so
+repeated view setup cannot duplicate defaults or restore deleted rows.
+
+### Work completed
+- Added an explicit initial-data lifecycle flag.
+- Added XCTest and static regression contracts for repeated seeding calls.
+
+### Threads
+- Started: none — work completed directly in the current repository.
+- Continued: none.
+- Stopped: none.
+
+### Files changed
+- `TravelList/TravelListTableViewController.swift` — guarded initial seeding.
+- `TravelListTests/TravelListTests.swift` — added the idempotency regression.
+- `scripts/check-baseline.py` — required the one-shot lifecycle contract.
+- Documentation and plan files — recorded behavior and validation limits.
+
+### Validation
+- `python3 scripts/check-baseline.py` — failed before implementation and passed after.
+- `/usr/bin/make check` — passed the baseline, six mutation checks, and the
+  conditional build gate; Xcode was unavailable locally.
+- `git diff --check` — passed.
+
+### Bugs / findings
+- P2: repeated `loadInitialData()` calls appended duplicate sample rows; an
+  emptiness-only guard would also restore defaults after users deleted all rows.
+
+### Blockers
+- `xcodebuild` is unavailable locally; hosted macOS CI remains authoritative for
+  app and XCTest compilation/execution.
+
+### Next action
+- Open a PR and complete Codex plus hosted review before merge.
+
 ## 2026-06-21
 
 - Aligned target-local app and XCTest bundle identifiers with their existing
