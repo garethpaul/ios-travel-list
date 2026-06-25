@@ -55,6 +55,8 @@ The checked-in project has no external dependency manifest. Use Xcode for full b
 - Run `./build.sh` to compile the unsigned Swift 5 app for the simulator when
   Xcode is installed.
 - The sample is local-first and keeps list items in memory.
+- Phone, Wallet, and Passport are seeded only once per table controller, so
+  repeated view setup cannot duplicate defaults or restore user-deleted rows.
 - New item names go through a shared name normalizer at both UI creation and the collection add boundary; whitespace-only entries are ignored and accepted Unicode horizontal whitespace runs are stored as one ordinary space.
 - Add-screen textfield outlet reads fall back through the same normalizer when the outlet is unavailable.
 - Focused normalizer tests cover trimmed, blank, missing, control-character,
@@ -119,6 +121,8 @@ When the required SDK or runtime is unavailable, use static checks and source re
   embedded control-character boundary.
 - See `docs/plans/2026-06-17-020-reject-unicode-line-separators-plan.md` for the
   Unicode line separator boundary.
+- See `docs/plans/2026-06-25-idempotent-initial-items.md` for one-shot sample
+  seeding and lifecycle regression coverage.
 - See `docs/plans/2026-06-09-navigation-logo-title-view.md` for the navigation logo title view guardrail.
 - See `docs/plans/2026-06-10-add-textfield-outlet-guard.md` for the textfield outlet guardrail.
 - See `docs/plans/2026-06-09-make-gate-aliases.md` for the local gate alias guardrail.

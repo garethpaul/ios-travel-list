@@ -29,6 +29,8 @@ Helpful reports include:
 - Review found file, document, data, or media parsing flows; changes in those areas should receive security-focused review before merge.
 - No primary dependency manifest was detected in the repository root. If dependencies are added later, include a manifest and prefer reproducible installation instructions.
 - Travel lists can reveal personal plans and routines. Keep item data local-first unless a future change documents storage, sync, consent, retention, and deletion behavior.
+- Initial sample rows are seeded once per controller so repeated lifecycle setup
+  cannot unexpectedly restore locally deleted list content.
 - `make check` runs a static baseline that guards plist/storyboard metadata, Xcode project wiring, source inventory, the shared name normalizer, embedded control-character rejection, Unicode line separators, collection add-boundary normalization, normalizer tests, cell index checks, removal index checks, duplicate item checks, navigation logo title view ownership, cell rendering, stale cell reset handling, and logging/network/persistence regressions when Xcode is unavailable.
 - Travel items use typed Swift array storage so malformed Objective-C collection
   contents cannot enter the rendering and removal paths.

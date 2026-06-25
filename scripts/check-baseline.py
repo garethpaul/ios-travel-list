@@ -383,8 +383,12 @@ def main():
     require("reloadData" not in cell_method,
             "cellForRowAtIndexPath must not reload the table while rendering cells",
             failures)
-    require("loadInitialData" in table_controller and "Phone" in table_controller and "Wallet" in table_controller and "Passport" in table_controller,
-            "TravelListTableViewController must keep the sample seed items",
+    require("private var didLoadInitialData = false" in table_controller and
+            "guard !didLoadInitialData else" in table_controller and
+            "didLoadInitialData = true" in table_controller and
+            "loadInitialData" in table_controller and "Phone" in table_controller and "Wallet" in table_controller and "Passport" in table_controller and
+            "testLoadInitialDataSeedsDefaultsOnlyOnce" in tests,
+            "TravelListTableViewController must seed sample items only once",
             failures)
     require("final class TravelListItem" in item_model and "creationDate" in item_model,
             "TravelListItem model must keep name/completion/date fields",
