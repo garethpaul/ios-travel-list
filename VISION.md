@@ -31,6 +31,7 @@ Priority:
   duplicate or restore list rows
 - Keep process-memory-only item ownership and reset behavior explicit until a
   separate persistence design is approved
+- Keep initial defaults on the canonical duplicate-aware collection boundary
 - Keep fallback cell rendering configurable for valid rows
 - Clear stale cell state when invalid or malformed rows use fallback cells
 - Keep the travel logo scoped to each navigation item title view

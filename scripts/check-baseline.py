@@ -398,12 +398,19 @@ def main():
     require("reloadData" not in cell_method,
             "cellForRowAtIndexPath must not reload the table while rendering cells",
             failures)
+    load_initial_start = table_controller.find("func loadInitialData()")
+    load_initial_end = table_controller.find("override func numberOfSections", load_initial_start)
+    load_initial_body = table_controller[load_initial_start:load_initial_end]
     require("private var didLoadInitialData = false" in table_controller and
             "guard !didLoadInitialData else" in table_controller and
             "didLoadInitialData = true" in table_controller and
             "loadInitialData" in table_controller and "Phone" in table_controller and "Wallet" in table_controller and "Passport" in table_controller and
-            "testLoadInitialDataSeedsDefaultsOnlyOnce" in tests,
-            "TravelListTableViewController must seed sample items only once",
+            "testLoadInitialDataSeedsDefaultsOnlyOnce" in tests and
+            "testLoadInitialDataDoesNotDuplicateExistingDefault" in tests and
+            'for itemName in ["Phone", "Wallet", "Passport"]' in load_initial_body and
+            "addTravelItem(TravelListItem(name: itemName))" in load_initial_body and
+            "travelItems.append" not in load_initial_body,
+            "TravelListTableViewController must seed defaults once through the duplicate-aware add boundary",
             failures)
     require("final class TravelListItem" in item_model and "creationDate" in item_model,
             "TravelListItem model must keep name/completion/date fields",
