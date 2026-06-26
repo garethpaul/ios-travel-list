@@ -32,8 +32,11 @@ which persistence and transmission behaviors do not exist.
 - `make check` passed the static baseline, build wrapper, and ten hostile
   contract mutations.
 - `git diff --check` passed.
-- Hosted Xcode verification, Codex review, and exact merge verification remain
-  required before merge.
+- `codex review --base origin/master` was attempted but the external service
+  returned HTTP 401 before analysis; manual diff review found no actionable
+  issue, and the run continued under the instruction to skip authentication
+  failures.
+- Hosted Xcode and exact merge verification remain required before merge.
 
 ### Bugs / findings
 - P2: The README said the app was local-first and in-memory, but did not define
@@ -43,6 +46,7 @@ which persistence and transmission behaviors do not exist.
 ### Blockers
 - `xcodebuild` is unavailable locally; hosted macOS CI is authoritative for the
   app and XCTest build.
+- External Codex review authentication is unavailable in this environment.
 
 ### Next action
 - Open the PR, run Codex review, and merge only after hosted checks pass.
