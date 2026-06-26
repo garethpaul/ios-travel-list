@@ -68,12 +68,17 @@ duplicate-aware collection boundary.
   the rebased combined suite rejected twelve mutations, while `xcodebuild` was
   unavailable locally and skipped explicitly.
 - `git diff --check` passed.
+- `codex review --base origin/master` was attempted on the rebased exact diff,
+  but the external service returned HTTP 401 before analysis; manual review of
+  the source, XCTest, contracts, and merged documentation found no actionable
+  issue, and the run continued under the instruction to skip auth failures.
 
 ### Bugs / findings
 - P2: direct initial appends could duplicate an equivalent preexisting default.
 
 ### Blockers
 - Hosted macOS CI remains authoritative for Swift compiler and XCTest evidence.
+- External Codex review authentication is unavailable in this environment.
 
 ### Next action
 - Merge only after exact-head Codex/manual review and hosted checks pass.
