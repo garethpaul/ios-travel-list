@@ -40,6 +40,10 @@ Helpful reports include:
   material, or persisting the workflow token in local Git configuration.
 - Do not add list uploads, sync, deployment, or credentialed service steps to
   that workflow without a separate privacy and security review.
+- Travel items currently exist only in the active controller's process memory;
+  the app has no disk persistence, backup, export, sync, analytics, or list
+  logging path. A future storage or transfer design must define user consent,
+  retention, deletion, and ownership before implementation.
 
 ## Mobile Privacy Notes
 

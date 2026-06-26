@@ -1,5 +1,52 @@
 # Changes
 
+## 2026-06-26 00:13 PDT - P2 - Clarify in-memory data ownership
+
+### Summary
+The project now states exactly where travel items live, when they reset, and
+which persistence and transmission behaviors do not exist.
+
+### Work completed
+- Documented controller-owned process-memory storage and one-shot sample reset
+  behavior without adding persistence.
+- Made the absence of disk storage, backup, export, sync, analytics, and list
+  logging explicit in user and security guidance.
+- Closed the stale persistence-clarification roadmap item while preserving a
+  design gate for any future storage or transfer feature.
+- Added baseline and hostile-mutation contracts for the ownership boundary.
+
+### Threads
+- None; work completed directly in this maintenance cycle.
+
+### Files changed
+- `README.md`, `SECURITY.md`, and `VISION.md` — lifetime, privacy, and roadmap
+  contracts.
+- `scripts/check-baseline.py` and `scripts/test-check-baseline.py` — static and
+  hostile-mutation coverage.
+- `docs/plans/2026-06-26-in-memory-data-ownership.md` and `CHANGES.md` — plan
+  and cycle evidence.
+
+### Validation
+- Red phase: `python3 scripts/check-baseline.py` rejected all four missing
+  ownership and roadmap contracts before documentation was added.
+- `make check` passed the static baseline, build wrapper, and ten hostile
+  contract mutations.
+- `git diff --check` passed.
+- Hosted Xcode verification, Codex review, and exact merge verification remain
+  required before merge.
+
+### Bugs / findings
+- P2: The README said the app was local-first and in-memory, but did not define
+  controller lifetime, reset behavior, or the complete absence of durable and
+  transmitted data paths.
+
+### Blockers
+- `xcodebuild` is unavailable locally; hosted macOS CI is authoritative for the
+  app and XCTest build.
+
+### Next action
+- Open the PR, run Codex review, and merge only after hosted checks pass.
+
 ## 2026-06-25 04:54 - P2 - Make sample seeding idempotent
 
 ### Summary

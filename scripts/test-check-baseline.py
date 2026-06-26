@@ -11,6 +11,30 @@ ROOT = Path(__file__).resolve().parents[1]
 
 MUTATIONS = [
     (
+        "remove in-memory ownership heading",
+        "README.md",
+        "## Data Ownership and Lifetime",
+        "## Data Lifetime",
+    ),
+    (
+        "claim durable storage",
+        "README.md",
+        "not written to disk, synced, uploaded, logged, or sent to analytics",
+        "written to disk",
+    ),
+    (
+        "remove reset behavior",
+        "README.md",
+        "A new controller or app process starts again with the checked-in sample items.",
+        "The list may remain available indefinitely.",
+    ),
+    (
+        "restore persistence roadmap item",
+        "VISION.md",
+        "Next priorities:",
+        "Next priorities:\n\n- Clarify persistence behavior and data ownership",
+    ),
+    (
         "remove width-insensitive duplicate folding",
         "TravelList/TravelListItem.swift",
         ".caseInsensitive, .widthInsensitive",
