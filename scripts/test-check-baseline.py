@@ -94,6 +94,24 @@ MUTATIONS = [
         "testLoadInitialDataDoesNotDuplicateExistingDefault",
         "testLoadInitialDataAllowsDuplicateExistingDefault",
     ),
+    (
+        "remove travel item character guard",
+        "TravelList/TravelListItem.swift",
+        "guard normalizedName.count <= maximumTravelItemCharacters else",
+        "if normalizedName.count <= maximumTravelItemCharacters",
+    ),
+    (
+        "remove travel item length XCTest evidence",
+        "TravelListTests/TravelListTests.swift",
+        "testTravelItemNameNormalizationEnforcesCharacterLimit",
+        "testTravelItemNameNormalizationAllowsUnboundedNames",
+    ),
+    (
+        "remove travel item length documentation",
+        "README.md",
+        "Travel item names are limited to 100 user-perceived characters after normalization.",
+        "Travel item names are normalized.",
+    ),
 ]
 
 

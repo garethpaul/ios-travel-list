@@ -46,6 +46,7 @@ Helpful reports include:
   the app has no disk persistence, backup, export, sync, analytics, or list
   logging path. A future storage or transfer design must define user consent,
   retention, deletion, and ownership before implementation.
+- Travel item names are limited to 100 user-perceived characters after normalization.
 
 ## Mobile Privacy Notes
 

@@ -60,6 +60,7 @@ The checked-in project has no external dependency manifest. Use Xcode for full b
   Seeding uses the same normalized duplicate-aware add boundary as user items,
   so equivalent preexisting defaults are retained rather than appended again.
 - New item names go through a shared name normalizer at both UI creation and the collection add boundary; whitespace-only entries are ignored and accepted Unicode horizontal whitespace runs are stored as one ordinary space.
+- Travel item names are limited to 100 user-perceived characters after normalization.
 - Add-screen textfield outlet reads fall back through the same normalizer when the outlet is unavailable.
 - Focused normalizer tests cover trimmed, blank, missing, control-character,
   Unicode line separator, and horizontal Unicode whitespace travel item names.

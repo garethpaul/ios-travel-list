@@ -21,6 +21,7 @@ Priority:
 - Avoid syncing or uploading travel-list data without explicit design
 - Keep normalizer tests focused on trimmed, blank, missing, embedded-control,
   Unicode line separators, and internationalized travel item names
+- Travel item names are limited to 100 user-perceived characters after normalization.
 - Keep add-screen textfield outlet reads guarded before item creation
 - Keep table rendering guarded against stale local indexes
 - Keep item removal index handling guarded before local list mutation
