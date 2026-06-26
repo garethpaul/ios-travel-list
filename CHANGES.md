@@ -1,5 +1,33 @@
 # Changes
 
+## 2026-06-26 12:52 PDT - P2 - Bound normalized travel item names
+
+### Summary
+Travel item names are limited to 100 user-perceived characters after normalization.
+
+### Work completed
+- Added a model-owned maximum after whitespace canonicalization, shared by UI
+  creation, direct collection callers, and initial sample seeding.
+- Added exact-limit XCTest coverage for ASCII and emoji grapheme clusters.
+- Added static and hostile-mutation contracts plus maintained documentation.
+
+### Validation
+- Red phase: the baseline rejected the missing 100-character model boundary.
+- `make check` passed the static baseline and build wrapper; `xcodebuild` was
+  unavailable locally and skipped explicitly.
+- Fifteen hostile mutations, including removal of the model guard, XCTest, or
+  documentation contract, were rejected.
+- `git diff --check` passed.
+
+### Bugs / findings
+- P2: arbitrarily large local item strings could enter memory and table labels.
+
+### Blockers
+- Hosted macOS CI remains authoritative for Swift compilation and XCTest.
+
+### Next action
+- Open the PR, run Codex review, and merge only after hosted checks pass.
+
 ## 2026-06-26 00:13 PDT - P2 - Clarify in-memory data ownership
 
 ### Summary

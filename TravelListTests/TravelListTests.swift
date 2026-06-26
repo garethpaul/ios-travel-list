@@ -54,6 +54,16 @@ final class MyAppTests: XCTestCase {
         XCTAssertEqual(TravelListItem.normalizedName("  Café Guide  "), "Café Guide")
     }
 
+    func testTravelItemNameNormalizationEnforcesCharacterLimit() {
+        let maximumASCIIName = String(repeating: "A", count: 100)
+        let maximumEmojiName = String(repeating: "😀", count: 100)
+
+        XCTAssertEqual(TravelListItem.normalizedName(maximumASCIIName), maximumASCIIName)
+        XCTAssertNil(TravelListItem.normalizedName(String(repeating: "A", count: 101)))
+        XCTAssertEqual(TravelListItem.normalizedName(maximumEmojiName), maximumEmojiName)
+        XCTAssertNil(TravelListItem.normalizedName(String(repeating: "😀", count: 101)))
+    }
+
     func testRemoveTravelItemAtIndexRemovesValidItem() {
         let controller = TravelListTableViewController()
         controller.travelItems.append(TravelListItem(name: "Passport"))

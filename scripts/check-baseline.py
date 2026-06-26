@@ -152,6 +152,7 @@ def main():
         "docs/plans/2026-06-16-travel-item-control-character-guard.md",
         "docs/plans/2026-06-17-020-reject-unicode-line-separators-plan.md",
         "docs/plans/2026-06-19-unicode-travel-item-canonicalization.md",
+        "docs/plans/2026-06-26-travel-item-length-boundary.md",
         "docs/plans/2026-06-26-in-memory-data-ownership.md",
         "docs/readme-overview.svg",
     ]
@@ -215,6 +216,19 @@ def main():
     control_character_plan = CONTROL_CHARACTER_PLAN.read_text(encoding="utf-8") if CONTROL_CHARACTER_PLAN.exists() else ""
     unicode_line_separator_plan = UNICODE_LINE_SEPARATOR_PLAN.read_text(encoding="utf-8") if UNICODE_LINE_SEPARATOR_PLAN.exists() else ""
     workflow = read(".github/workflows/check.yml")
+
+    length_contract = "Travel item names are limited to 100 user-perceived characters after normalization."
+    for path, source in [
+        ("README.md", readme),
+        ("SECURITY.md", security),
+        ("VISION.md", vision),
+        ("CHANGES.md", changes),
+    ]:
+        require(length_contract in source,
+                f"{path} must keep the travel item length contract", failures)
+    length_plan = read("docs/plans/2026-06-26-travel-item-length-boundary.md")
+    require("Status: Completed" in length_plan and "make check" in length_plan,
+            "travel item length plan must record completed verification", failures)
 
     for contract in [
         "## Data Ownership and Lifetime",
@@ -294,6 +308,11 @@ def main():
             '.joined(separator: " ")' in item_model and
             item_model.count("return nil") >= 3,
             "TravelListItem must expose a shared optional name normalizer with control, newline, and horizontal-whitespace boundaries",
+            failures)
+    require("private let maximumTravelItemCharacters = 100" in item_model and
+            "guard normalizedName.count <= maximumTravelItemCharacters else" in item_model and
+            "testTravelItemNameNormalizationEnforcesCharacterLimit" in tests,
+            "TravelListItem must reject normalized names over 100 characters",
             failures)
     require("class func duplicateKey(forNormalizedName name: String) -> String" in item_model and
             "options: [.caseInsensitive, .widthInsensitive]" in item_model and

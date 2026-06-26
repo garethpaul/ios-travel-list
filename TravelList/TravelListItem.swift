@@ -1,5 +1,7 @@
 import Foundation
 
+private let maximumTravelItemCharacters = 100
+
 final class TravelListItem: NSObject {
     var itemName: String
     var completed = false
@@ -24,9 +26,15 @@ final class TravelListItem: NSObject {
             return nil
         }
 
-        return itemName.components(separatedBy: .whitespaces)
+        let normalizedName = itemName.components(separatedBy: .whitespaces)
             .filter { !$0.isEmpty }
             .joined(separator: " ")
+
+        guard normalizedName.count <= maximumTravelItemCharacters else {
+            return nil
+        }
+
+        return normalizedName
     }
 
     class func duplicateKey(forNormalizedName name: String) -> String {
