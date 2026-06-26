@@ -17,16 +17,24 @@ Travel item names are limited to 100 user-perceived characters after normalizati
   unavailable locally and skipped explicitly.
 - Fifteen hostile mutations, including removal of the model guard, XCTest, or
   documentation contract, were rejected.
+- Both hosted macOS baseline jobs passed the unsigned app build and app-hosted
+  XCTest target; CodeQL Actions, Python, and Swift analyses also passed.
 - `git diff --check` passed.
+- `/home/gpj/.codex/skills/codex-review/scripts/codex-review --mode branch`
+  targeted `origin/master` but could not authenticate to the external review
+  service (HTTP 401). Immutable manual review of the pushed commit found no
+  actionable issue.
 
 ### Bugs / findings
 - P2: arbitrarily large local item strings could enter memory and table labels.
 
 ### Blockers
 - Hosted macOS CI remains authoritative for Swift compilation and XCTest.
+- External Codex review authentication is unavailable in this environment; it
+  does not block the locally and hosted-validated length boundary.
 
 ### Next action
-- Open the PR, run Codex review, and merge only after hosted checks pass.
+- PR #16 merged as `88e6dae2576438b209df37c99f0f0373984044fb` after hosted checks passed.
 
 ## 2026-06-26 00:13 PDT - P2 - Clarify in-memory data ownership
 
