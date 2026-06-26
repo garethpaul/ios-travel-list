@@ -69,6 +69,20 @@ The checked-in project has no external dependency manifest. Use Xcode for full b
 - The travel logo is scoped to each navigation item title view instead of being
   added as a navigation-controller overlay.
 
+## Data Ownership and Lifetime
+
+Travel items belong to the person using the current app session and remain only
+in the current list controller's in-memory array.
+They are not written to disk, synced, uploaded, logged, or sent to analytics.
+Additions, completion state, and deletions last only while that controller
+remains alive.
+
+A new controller or app process starts again with the checked-in sample items.
+Deleting all rows does not restore them in the same controller because sample
+seeding is one-shot. Any future persistence, backup, export, or sync design must
+define consent, retention, deletion, device-transfer, and ownership behavior
+before storing or transmitting travel plans.
+
 ## Testing and Verification
 
 Run the local static baseline:
@@ -123,6 +137,8 @@ When the required SDK or runtime is unavailable, use static checks and source re
   Unicode line separator boundary.
 - See `docs/plans/2026-06-25-idempotent-initial-items.md` for one-shot sample
   seeding and lifecycle regression coverage.
+- See `docs/plans/2026-06-26-in-memory-data-ownership.md` for the current
+  process-memory lifetime and future persistence design boundary.
 - See `docs/plans/2026-06-09-navigation-logo-title-view.md` for the navigation logo title view guardrail.
 - See `docs/plans/2026-06-10-add-textfield-outlet-guard.md` for the textfield outlet guardrail.
 - See `docs/plans/2026-06-09-make-gate-aliases.md` for the local gate alias guardrail.

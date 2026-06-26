@@ -152,6 +152,7 @@ def main():
         "docs/plans/2026-06-16-travel-item-control-character-guard.md",
         "docs/plans/2026-06-17-020-reject-unicode-line-separators-plan.md",
         "docs/plans/2026-06-19-unicode-travel-item-canonicalization.md",
+        "docs/plans/2026-06-26-in-memory-data-ownership.md",
         "docs/readme-overview.svg",
     ]
 
@@ -214,6 +215,20 @@ def main():
     control_character_plan = CONTROL_CHARACTER_PLAN.read_text(encoding="utf-8") if CONTROL_CHARACTER_PLAN.exists() else ""
     unicode_line_separator_plan = UNICODE_LINE_SEPARATOR_PLAN.read_text(encoding="utf-8") if UNICODE_LINE_SEPARATOR_PLAN.exists() else ""
     workflow = read(".github/workflows/check.yml")
+
+    for contract in [
+        "## Data Ownership and Lifetime",
+        "current list controller's in-memory array",
+        "not written to disk, synced, uploaded, logged, or sent to analytics",
+        "A new controller or app process starts again with the checked-in sample items.",
+    ]:
+        require(contract in readme, f"README data ownership contract is missing: {contract}", failures)
+
+    require(
+        "Clarify persistence behavior and data ownership" not in vision,
+        "VISION must not retain the completed persistence clarification item",
+        failures,
+    )
 
     require(app_plist.get("CFBundleIdentifier", "").startswith("com.garethpaul."),
             "TravelList Info.plist must keep the expected sample bundle identifier",
