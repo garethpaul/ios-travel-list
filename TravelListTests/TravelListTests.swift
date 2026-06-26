@@ -17,6 +17,15 @@ final class MyAppTests: XCTestCase {
         XCTAssertEqual(controller.travelItems.map { $0.itemName }, ["Phone", "Wallet", "Passport"])
     }
 
+    func testLoadInitialDataDoesNotDuplicateExistingDefault() {
+        let controller = TravelListTableViewController()
+
+        XCTAssertTrue(controller.addTravelItem(TravelListItem(name: "phone")))
+        controller.loadInitialData()
+
+        XCTAssertEqual(controller.travelItems.map { $0.itemName }, ["phone", "Wallet", "Passport"])
+    }
+
     func testTravelItemNameNormalizationTrimsWhitespace() {
         XCTAssertEqual(TravelListItem.normalizedName("  Passport\n"), "Passport", "Travel item names should be trimmed before saving")
     }

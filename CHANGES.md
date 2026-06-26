@@ -51,6 +51,33 @@ which persistence and transmission behaviors do not exist.
 ### Next action
 - Open the PR, run Codex review, and merge only after hosted checks pass.
 
+## 2026-06-25 - P2 - Seed defaults through the add boundary
+
+### Summary
+Routed initial Phone, Wallet, and Passport rows through the normalized
+duplicate-aware collection boundary.
+
+### Work completed
+- Preserved one-shot controller ownership and empty-list sample order.
+- Added XCTest for an equivalent preexisting default.
+- Added two hostile mutations; the rebased combined suite now rejects twelve.
+
+### Validation
+- `python3 scripts/check-baseline.py` failed before implementation and passed after.
+- `/usr/bin/make check` and the absolute external-directory Make gate passed;
+  the rebased combined suite rejected twelve mutations, while `xcodebuild` was
+  unavailable locally and skipped explicitly.
+- `git diff --check` passed.
+
+### Bugs / findings
+- P2: direct initial appends could duplicate an equivalent preexisting default.
+
+### Blockers
+- Hosted macOS CI remains authoritative for Swift compiler and XCTest evidence.
+
+### Next action
+- Merge only after exact-head Codex/manual review and hosted checks pass.
+
 ## 2026-06-25 04:54 - P2 - Make sample seeding idempotent
 
 ### Summary

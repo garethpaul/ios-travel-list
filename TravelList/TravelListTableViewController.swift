@@ -34,9 +34,9 @@ class TravelListTableViewController: UITableViewController {
         }
         didLoadInitialData = true
 
-        travelItems.append(TravelListItem(name: "Phone"))
-        travelItems.append(TravelListItem(name: "Wallet"))
-        travelItems.append(TravelListItem(name: "Passport"))
+        for itemName in ["Phone", "Wallet", "Passport"] {
+            _ = addTravelItem(TravelListItem(name: itemName))
+        }
     }
 
     override func numberOfSections(in tableView: UITableView) -> Int {

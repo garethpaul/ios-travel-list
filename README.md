@@ -57,6 +57,8 @@ The checked-in project has no external dependency manifest. Use Xcode for full b
 - The sample is local-first and keeps list items in memory.
 - Phone, Wallet, and Passport are seeded only once per table controller, so
   repeated view setup cannot duplicate defaults or restore user-deleted rows.
+  Seeding uses the same normalized duplicate-aware add boundary as user items,
+  so equivalent preexisting defaults are retained rather than appended again.
 - New item names go through a shared name normalizer at both UI creation and the collection add boundary; whitespace-only entries are ignored and accepted Unicode horizontal whitespace runs are stored as one ordinary space.
 - Add-screen textfield outlet reads fall back through the same normalizer when the outlet is unavailable.
 - Focused normalizer tests cover trimmed, blank, missing, control-character,
@@ -94,7 +96,7 @@ make build
 make check
 ```
 
-Each Make gate runs `scripts/check-baseline.py` plus six hostile static contract mutations, parses plist/storyboard/asset metadata, checks image resources and Xcode wiring, verifies typed travel-item storage, the shared name normalizer and its embedded control-character guard, rejects Unicode line separators, canonicalizes horizontal Unicode whitespace, checks the fixed-locale case/width duplicate key, guarded textfield outlet reads, focused XCTest source, target-local bundle identifiers, navigation logo title view ownership, fallback cell reset, table/removal index guards, invalid color fallback, and side-effect-free cell rendering, and guards against logging, network, upload, analytics, or persistence behavior. When Xcode is available the same gate compiles the unsigned app and XCTest target; otherwise the build step skips cleanly.
+Each Make gate runs `scripts/check-baseline.py` plus twelve hostile static contract mutations, parses plist/storyboard/asset metadata, checks image resources and Xcode wiring, verifies typed travel-item storage, duplicate-aware one-shot sample seeding, the shared name normalizer and its embedded control-character guard, rejects Unicode line separators, canonicalizes horizontal Unicode whitespace, checks the fixed-locale case/width duplicate key, guarded textfield outlet reads, focused XCTest source, target-local bundle identifiers, navigation logo title view ownership, fallback cell reset, table/removal index guards, invalid color fallback, and side-effect-free cell rendering, and guards against logging, network, upload, analytics, or persistence behavior. When Xcode is available the same gate compiles the unsigned app and XCTest target; otherwise the build step skips cleanly.
 
 Pinned `macos-15` GitHub Actions runs `make check` and compiles the unsigned
 Swift 5 app and XCTest target. This hosted validation does not inspect travel-item data,

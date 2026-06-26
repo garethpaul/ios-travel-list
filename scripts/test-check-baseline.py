@@ -82,6 +82,18 @@ MUTATIONS = [
         "\t\t\t};\n"
         "\t\t\tname = Release;",
     ),
+    (
+        "bypass duplicate-aware initial seeding",
+        "TravelList/TravelListTableViewController.swift",
+        "_ = addTravelItem(TravelListItem(name: itemName))",
+        "travelItems.append(TravelListItem(name: itemName))",
+    ),
+    (
+        "remove preexisting default seed XCTest evidence",
+        "TravelListTests/TravelListTests.swift",
+        "testLoadInitialDataDoesNotDuplicateExistingDefault",
+        "testLoadInitialDataAllowsDuplicateExistingDefault",
+    ),
 ]
 
 
